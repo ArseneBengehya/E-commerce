@@ -18,6 +18,7 @@ return (
       </main>
 
       {/* <Footer /> */}
+      <Footer/>
     </div>
   </div>
 );
