@@ -5,20 +5,17 @@ export default function ClientLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
-return (
-  <div className="w-full h-screen flex flex-col overflow-hidden py-2">
-    {/* Le Header prend sa hauteur naturelle */}
+}>) {return (
+  <div className="w-full h-screen flex flex-col overflow-hidden">
     <Header />
 
-    {/* Ce conteneur prend TOUT l'espace restant et gère le scroll proprement */}
-    <div className="flex-1 overflow-y-auto w-full flex flex-col bg-background">
+    <div className="flex-1 overflow-y-auto w-full flex flex-col justify-between">
+      
       <main className="flex-1 w-full">
         {children}
       </main>
 
-      {/* <Footer /> */}
-      <Footer/>
+      <Footer />
     </div>
   </div>
 );
