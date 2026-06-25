@@ -42,6 +42,7 @@ const Header = () => {
       show: true,
     },
   ];
+
   return (
     <div className="w-full">
       <div className="flex items-center justify-between px-20">
@@ -78,11 +79,19 @@ const Header = () => {
           </div>
 
           {/* ICONS */}
-          <button className="p-1 hover:text-primary transition-colors cursor-pointer ">
+          <button className="p-1 hover:text-primary transition-colors cursor-pointer "
+          onClick={()=>{
+            router.push("/cart")
+          }}
+          >
             <CiShoppingCart size={20} />
           </button>
 
-          <button className="p-1 hover:text-primary transition-colors cursor-pointer">
+          <button className="p-1 hover:text-primary transition-colors cursor-pointer"
+                    onClick={()=>{
+            router.push("/favorite")
+          }}
+          >
             <MdFavoriteBorder size={18} />
           </button>
         </div>

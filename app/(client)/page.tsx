@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@mantine/core";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CiShoppingCart } from "react-icons/ci";
 import { MdFavoriteBorder } from "react-icons/md";
@@ -96,6 +97,8 @@ export default function Home() {
   const tabs = ["Vedette", "Recents", "Anciens"];
   const [tabActive, setTabActive] = useState("Vedette");
 
+  const router = useRouter()
+
   return (
     <div className="w-full px-6 lg:px-20 mt-2">
       <div className="relative overflow-x-auto">
@@ -177,8 +180,11 @@ export default function Home() {
       </div>
       <div className="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {fakeProducts.map((product) => (
-          <div
+          <button
             key={product.id}
+            onClick={()=>{
+            router.push(`/shop/${product.id}`)
+          }}
             className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition"
           >
             <div className="h-40 overflow-hidden relative group/img">
@@ -204,18 +210,21 @@ export default function Home() {
               <h2 className="text-sm font-semibold line-clamp-2">
                 {product.name}
               </h2>
-
-              <div className="flex justify-between items-center">
-                <p className="font-bold mt-1">${product.price}</p>
-
-                <p>Disponible</p>
+              <div className="flex justify-between items-center text-[11px]">
+                <p className="font-black text-foreground text-sm">
+                  ${product.price}
+                </p>
+                <p className="text-emerald-600 dark:text-emerald-500 font-semibold bg-emerald-500/10 px-1.5 py-0.5 rounded-md text-[10px]">
+                  Disponible
+                </p>
               </div>
 
-              <button className="mt-2 w-full flex items-center gap-1 justify-center bg-primary text-white text-sm py-1 rounded-lg">
-                <p>Ajouter au panier</p> <CiShoppingCart size={20} />
+              <button className="w-full flex items-center gap-1.5 justify-center bg-primary hover:bg-orange-600 active:scale-[0.98] text-white text-[11px] font-bold py-1.5 rounded-lg transition-all cursor-pointer shadow-2xs">
+                <span>Ajouter au panier</span> 
+                <CiShoppingCart size={16} />
               </button>
             </div>
-          </div>
+          </button>
         ))}
       </div>
     </div>
