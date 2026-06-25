@@ -1,143 +1,129 @@
 "use client";
+
 import { AppName } from "../utils";
-import { Button, Divider, Input, Popover, Text } from "@mantine/core";
-import { CiSearch, CiShoppingCart } from "react-icons/ci";
-import { IoMdPerson } from "react-icons/io";
-import { MdFavoriteBorder } from "react-icons/md";
-import { FaUserCircle } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { useDisclosure } from "@mantine/hooks";
-import emptyCart from "../../public/4555971.png";
-import Image from "next/image";
-import ThemeSwitcher from "./ThemeSwitcher";
+import { Input } from "@mantine/core";
+import { CiSearch, CiShoppingCart } from "react-icons/ci";
+import { MdChevronRight, MdFavoriteBorder } from "react-icons/md";
+import Link from "next/link";
+// import ThemeSwitcher from "./ThemeSwitcher";
+import { usePathname } from "next/navigation";
 
 const Header = () => {
   const router = useRouter();
   const [opened, { close, open }] = useDisclosure(false);
   const [isCartOpen, { open: openCart, close: closeCart }] =
     useDisclosure(false);
+
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+  const pathSegments = pathname.split("/").filter((segment) => segment !== "");
+
+  const navigation = [
+    {
+      title: "Accueil",
+      link: "/",
+      show: true,
+    },
+    {
+      title: "Shop",
+      link: "/shop",
+      show: true,
+    },
+    {
+      title: "Mon compte",
+      link: "/profil",
+      show: true,
+    },
+    {
+      title: "Connexion",
+      link: "/",
+      show: true,
+    },
+  ];
   return (
-    <div className="flex items-center justify-between gap-4 bg-header text-foreground p-3 w-full">
-      {/* APP NAME */}
-      <h2>{AppName}</h2>
-
-      {/* SEARCH */}
-      <div className="flex-1 mx-4 relative">
-        <Input placeholder="Search everything..." />
-        <button className="absolute right-0 top-0 mt-2 mr-4 cursor-pointer">
-          <CiSearch size={24} />
-        </button>
-      </div>
-
-      <div className="flex justify-between items-center gap-3">
-        <button
-          className="group relative flex items-center justify-center cursor-pointer"
-          onClick={() => router.push("/favorite")}
-        >
-          <MdFavoriteBorder
-            size={20}
-            className="text-foreground group-hover:text-primary transition-colors"
-          />
-          <span className="absolute top-full mt-2 scale-0 group-hover:scale-100 transition-all duration-200 origin-top bg-black/80 backdrop-blur-md text-white text-xs px-2 py-1 rounded shadow-md whitespace-nowrap z-50">
-            Favoris
-          </span>
-        </button>
-
-        <Popover
-          width={350}
-          position="bottom"
-          withArrow
-          shadow="md"
-          opened={isCartOpen}
-        >
-          <Popover.Target>
-            <button
-              onMouseEnter={openCart}
-              onMouseLeave={closeCart}
-              className="cursor-pointer"
-            >
-              <CiShoppingCart
-                size={20}
-                className="text-foreground group-hover:text-primary transition-colors"
-              />
-            </button>
-          </Popover.Target>
-
-          <Popover.Dropdown onMouseEnter={openCart} onMouseLeave={closeCart}>
-            <Text fw={600} size="sm">
-              Panier
-            </Text>
-            <div className="flex flex-col items-center justify-center p-4">
-              <Image
-                src={emptyCart}
-                alt="Empty cart illustration"
-                className="w-30 h-30 text-center"
-              />
-              <Text size="sm" className="text-center mt-2">
-                Votre panier est vide
-              </Text>
-              <Button
-                className="mt-4 w-full"
-                variant="outline"
-                color="blue"
-                onClick={() => router.push("/cart")}
-                fullWidth
+    <div className="w-full">
+      <div className="flex items-center justify-between px-20">
+        {/* name and navigations */}
+        <div className="flex justify-between items-center gap-5">
+          <h2>{AppName}</h2>
+          <div className="flex items-center gap-3">
+            {navigation.map((item) => (
+              <Link
+                key={item.title}
+                href={item.link}
+                className={`font-bold ${pathname === item.link ? "text-primary" : "text-foreground"}`}
               >
-                Voir le panier
-              </Button>
-            </div>
-          </Popover.Dropdown>
-        </Popover>
+                {item.title}
+              </Link>
+            ))}
+          </div>
+        </div>
 
-        <Popover
-          width={200}
-          position="bottom"
-          withArrow
-          shadow="md"
-          opened={opened}
-        >
-          <Popover.Target>
-            <button
-              onMouseEnter={open}
-              onMouseLeave={close}
-              className="cursor-pointer"
-            >
-              <FaUserCircle
-                size={20}
-                className="text-foreground group-hover:text-primary transition-colors"
-              />
-            </button>
-          </Popover.Target>
+        {/* search, cart and favorite */}
+        <div className="flex items-center justify-end gap-4 flex-1">
+          {/* SEARCH CONTAINER (60% de l'espace alloué aux actions) */}
+          <div className="relative w-[60%]">
+            <Input
+              variant="outline"
+              placeholder="Recherche..."
+              size="xs"
+              className="w-full h-8 text-xs border border-gray-300 rounded-md"
+            />
+            <CiSearch
+              size={16}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted pointer-events-none"
+            />
+          </div>
 
-          <Popover.Dropdown onMouseEnter={open} onMouseLeave={close}>
-            <Text fw={600} size="sm">
-              Bonjour Portace
-            </Text>
+          {/* ICONS */}
+          <button className="p-1 hover:text-primary transition-colors cursor-pointer ">
+            <CiShoppingCart size={20} />
+          </button>
 
-            <Divider />
-
-            <div className="flex flex-col gap-2 mt-1">
-              <button className="text-left rounded-sm hover:bg-gray-100 dark:hover:bg-gray-300 text-sm py-1 px-1">
-                <Text size="sm">Mon compte</Text>{" "}
-              </button>
-
-              <button className="text-left rounded-sm hover:bg-gray-100 dark:hover:bg-gray-300 text-sm py-1 px-1">
-                <Text size="sm">Mes commandes</Text>
-              </button>
-              <ThemeSwitcher />
-              <Divider />
-              <button className="text-left rounded-sm hover:bg-gray-100 dark:hover:bg-gray-300 text-sm text-red-500 py-1 px-1">
-                Déconnexion
-              </button>
-            </div>
-          </Popover.Dropdown>
-        </Popover>
+          <button className="p-1 hover:text-primary transition-colors cursor-pointer">
+            <MdFavoriteBorder size={18} />
+          </button>
+        </div>
       </div>
 
-      <button className="flex items-center gap-2 bg-zinc-900 text-white px-3 py-2 rounded-md hover:bg-zinc-800 transition-colors">
-        <IoMdPerson size={20} />
-        <p className="text-sm">Se connecter</p>
-      </button>
+      {!isHome && (
+        <div className="bg-white py-3 px-20 mt-2">
+          <div className="max-w-7xl mx-auto flex items-center gap-1.5 text-[10px] font-semibold text-muted tracking-wide uppercase">
+            <Link href="/" className="hover:text-primary transition-colors">
+              Accueil
+            </Link>
+
+            {pathSegments.map((segment, index) => {
+              const href = `/${pathSegments.slice(0, index + 1).join("/")}`;
+              const isLast = index === pathSegments.length - 1;
+              const segmentName = decodeURIComponent(segment).replace(
+                /-/g,
+                " ",
+              );
+
+              return (
+                <div key={href} className="flex items-center gap-1.5">
+                  <MdChevronRight size={12} className="text-zinc-400" />
+                  {isLast ? (
+                    <span className="text-foreground font-bold truncate max-w-[120px]">
+                      {segmentName}
+                    </span>
+                  ) : (
+                    <Link
+                      href={href}
+                      className="hover:text-primary transition-colors"
+                    >
+                      {segmentName}
+                    </Link>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

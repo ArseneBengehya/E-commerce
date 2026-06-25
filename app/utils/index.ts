@@ -1,1 +1,1 @@
-export const AppName = "E-commerce"
+export const AppName ="KivuMarket"

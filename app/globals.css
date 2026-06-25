@@ -3,20 +3,24 @@
 
 @import "tailwindcss";
 
-/* Light mode */
+/* Mode clair */
 :root {
-  --background: #f3f4f6;
-  --foreground: #19181b;
-  --primary: #0284c7;
-   --header-bg: #ffffff;
+  --background: #f3f4f6; /* gray-100 */
+  --foreground: #111827; /* zinc-900 / gray-900 */
+  --primary: #f97316;    /* Orange par défaut (orange-500) */
+  --header-bg: #ffffff;  /* Entête blanche pour contraster avec le fond gris */
+  --card-bg: #ffffff;    /* Card en clair : white */
+  --muted: #6b7280;      /* gray-500 */
 }
 
-/* Dark mode */
+/* Mode sombre */
 .dark {
-  --background: #18181b;
-  --foreground: #f3f4f6;
-  --primary: #38bdf8;
-   --header-bg: #27272a;
+  --background: #18181b; /* theme sombre : zinc-900 */
+  --foreground: #f4f4f5; /* zinc-100 */
+  --primary: #f97316;    /* Orange reste la couleur principale */
+  --header-bg: #18181b;  /* Synchro avec le fond en mode sombre */
+  --card-bg: #27272a;    /* Card en dark : zinc-800 */
+  --muted: #a1a1aa;      /* zinc-400 */
 }
 
 /* Exposition des variables à Tailwind */
@@ -24,11 +28,12 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
+  --color-header: var(--header-bg);
+  --color-card: var(--card-bg);
+  --color-muted: var(--muted);
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-
-    --color-header: var(--header-bg);
 }
 
 html,
