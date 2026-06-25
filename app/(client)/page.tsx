@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { MdFavoriteBorder } from "react-icons/md";
 
 type Product = {
   id: string;
@@ -141,11 +142,14 @@ export default function Home() {
               />
 
               <div className="absolute top-2 left-2 bg-header text-foreground text-white text-xs px-2 py-1 rounded-full">
-                ⭐ {p.rating}
+                <MdFavoriteBorder
+                  size={20}
+                  className="text-foreground group-hover:text-primary transition-colors hover:text-red-500"
+                />
               </div>
 
-              <div className="absolute top-2 right-2 bg-header text-foreground text-black text-xs px-2 py-1 rounded-full">
-                {p.sold}+ sold
+              <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                Disponible
               </div>
             </div>
 
