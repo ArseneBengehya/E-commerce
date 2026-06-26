@@ -33,7 +33,7 @@ const Header = () => {
     },
     {
       title: "Mon compte",
-      link: "/profil",
+      link: "/account",
       show: true,
     },
     {

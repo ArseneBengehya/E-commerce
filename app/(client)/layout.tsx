@@ -11,7 +11,7 @@ export default function ClientLayout({
 
     <div className="flex-1 overflow-y-auto w-full flex flex-col justify-between">
       
-      <main className="flex-1 w-full">
+      <main className="flex-1 w-full mb-5">
         {children}
       </main>
 

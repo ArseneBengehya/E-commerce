@@ -5,6 +5,8 @@ import "./globals.css";
 // On importe ColorSchemeScript pour éviter les flashs de couleurs
 import { ColorSchemeScript, MantineProvider, createTheme } from "@mantine/core";
 import { AppName } from "./utils";
+import { ContextProvider } from "./context";
+import { ToastContainer } from "react-toastify";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,11 +45,12 @@ export default function RootLayout({
         {/* Ce script Mantine doit impérativement être avant le <body> */}
         <ColorSchemeScript defaultColorScheme="dark" />
       </head>
-      
+
       {/* Ton body profite maintenant des transitions fluides configurées dans globals.css */}
       <body className="w-full h-full flex flex-col overflow-hidden text-foreground bg-background">
         <MantineProvider theme={theme} defaultColorScheme="dark">
-          {children}
+          <ToastContainer/>
+            <ContextProvider>{children}</ContextProvider>
         </MantineProvider>
       </body>
     </html>
