@@ -11,7 +11,6 @@ const AccountLayout = ({ children }: { children: React.ReactNode }) => {
     {
       title: "Dashboard",
       link: "/account",
-      // Utilisation d'une icône plus neutre et cohérente avec les autres
       icon: <GoHome size={17} />,
     },
     {
