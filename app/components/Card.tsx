@@ -5,6 +5,7 @@ import { CiShoppingCart } from "react-icons/ci";
 import { MdFavoriteBorder, MdFavorite } from "react-icons/md";
 import { useCartStore } from "../store/useCartStore";
 import { useFavoriteStore } from "../store/useFavoriteStore";
+import { useMounted } from "@mantine/hooks";
 
 interface ProductProps {
   product: {
@@ -22,12 +23,8 @@ export const Card = ({ product }: ProductProps) => {
   
   // CONNEXION AU STORE DES FAVORIS
   const { toggleFavorite, isFavorite } = useFavoriteStore();
-  const [isMounted, setIsMounted] = useState(false);
 
-  // Sécurité d'hydratation pour charger l'état local du localStorage proprement
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const isMounted = useMounted();
 
   const productStock = product.stock || 10;
   const hasFavorite = isMounted ? isFavorite(product.id) : false;
