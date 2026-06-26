@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { checkAuth } from "../utils/checkAuth";
 
-// Type du produit dans le panier (on reprend ton type Product + la quantité)
 interface CartItem {
   id: string;
   name: string;
@@ -13,13 +13,16 @@ interface CartItem {
 
 interface CartState {
   cart: CartItem[];
-  
+
   // Actions
-addToCart: (product: Omit<CartItem, "quantity">, quantity: number) => void;
+  addToCart: (product: Omit<CartItem, "quantity">, quantity: number) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
-  
+
+  // Checkout
+  checkout: () => Promise<{ success: boolean; message: string }>;
+
   // Utilitaires calculés
   getTotalPrice: () => number;
   getCartCount: () => number;
@@ -30,67 +33,99 @@ export const useCartStore = create<CartState>()(
     (set, get) => ({
       cart: [],
 
-      // Ajouter un produit ou augmenter sa quantité s'il existe déjà
-addToCart: async (product, quantity) => {
-  
-  const currentCart = get().cart;
-  const existingItem = currentCart.find((item) => item.id === product.id);
+      addToCart: async (product, quantity) => {
+        const isAuthed = await checkAuth();
+        if (!isAuthed) return;
 
-  if (existingItem) {
-    // On ajoute la quantité choisie au lieu de faire +1
-    const newQuantity = existingItem.quantity + quantity;
-    
-    if (newQuantity > product.stock) return;
+        const currentCart = get().cart;
+        const existingItem = currentCart.find((item) => item.id === product.id);
 
-    set({
-      cart: currentCart.map((item) =>
-        item.id === product.id
-          ? { ...item, quantity: newQuantity }
-          : item,
-      ),
-    });
-  } else {
-    // On ajoute le nouveau produit avec la quantité choisie
-    set({ cart: [...currentCart, { ...product, quantity }] });
-  }
-},
+        if (existingItem) {
+          const newQuantity = existingItem.quantity + quantity;
+          if (newQuantity > product.stock) return;
 
-      // Supprimer complètement un produit du panier
-      removeFromCart: (productId) => {
+          set({
+            cart: currentCart.map((item) =>
+              item.id === product.id
+                ? { ...item, quantity: newQuantity }
+                : item,
+            ),
+          });
+        } else {
+          set({ cart: [...currentCart, { ...product, quantity }] });
+        }
+      },
+
+      removeFromCart: async (productId) => {
+        const isAuthed = await checkAuth();
+        if (!isAuthed) return;
         set({
           cart: get().cart.filter((item) => item.id !== productId),
         });
       },
 
-      // Modifier manuellement la quantité (+ / - ou input)
-      updateQuantity: (productId, quantity) => {
+      updateQuantity: async (productId, quantity) => {
+        const isAuthed = await checkAuth();
+        if (!isAuthed) return;
+
         if (quantity <= 0) {
           get().removeFromCart(productId);
           return;
         }
         set({
           cart: get().cart.map((item) =>
-            item.id === productId ? { ...item, quantity } : item
+            item.id === productId ? { ...item, quantity } : item,
           ),
         });
       },
 
-      // Vider tout le panier (après une commande réussie par exemple)
       clearCart: () => set({ cart: [] }),
 
-      // Calculer le prix total global
-      getTotalPrice: () => {
-        return get().cart.reduce((total, item) => total + item.price * item.quantity, 0);
+      // LOGIQUE DE CHECKOUT
+      checkout: async () => {
+        const isAuthed = await checkAuth();
+        if (!isAuthed)
+          return {
+            success: false,
+            message: "Vous devez être connecté pour commander.",
+          };
+
+        const { cart, clearCart } = get();
+        if (cart.length === 0)
+          return { success: false, message: "Votre panier est vide." };
+
+        try {
+          // Simulation d'une requête API vers ton backend
+          // Ici, tu appelleras une route API type: await fetch('/api/checkout', { method: 'POST', body: JSON.stringify(cart) })
+          console.log("Traitement de la commande pour :", cart);
+
+          await new Promise((resolve) => setTimeout(resolve, 2000)); // Latence de 2s simulée
+
+          // Une fois le paiement validé côté serveur :
+          clearCart();
+          return { success: true, message: "Commande validée avec succès !" };
+        } catch (error) {
+          return {
+            success: false,
+            message: "Erreur lors du paiement. Veuillez réessayer.",
+          };
+        }
       },
 
-      // Calculer le nombre total d'articles dans le panier
+      getTotalPrice: () => {
+        return get().cart.reduce(
+          (total, item) => total + item.price * item.quantity,
+          0,
+        );
+      },
+
       getCartCount: () => {
         return get().cart.reduce((count, item) => count + item.quantity, 0);
       },
     }),
     {
-      name: "cart-storage", // Clé unique pour le panier dans le localStorage
+      name: "cart-storage",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );

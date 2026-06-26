@@ -4,7 +4,8 @@ import { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CiTrash } from "react-icons/ci";
 import { useCartStore } from "@/app/store/useCartStore";
-import { useMounted } from "@mantine/hooks";
+import { useDisclosure, useMounted } from "@mantine/hooks";
+import PaymentModal from "@/app/components/PaymentModal";
 
 // Formateur monétaire en Dollars ($) cohérent avec tes fiches produits
 const formatCurrency = (value: number) =>
@@ -22,6 +23,11 @@ const Page = () => {
     useCartStore();
 
   const isMounted = useMounted();
+
+  const [openedAdd, { open: openAdd, close: closeAdd }] = useDisclosure(false);
+  const handleAdd = () => {
+    openAdd();
+  };
 
   // CALCULS DYNAMIQUES BASÉS SUR TON STORE
   const cartTotal = useMemo(() => getTotalPrice(), [cart, getTotalPrice]);
@@ -249,6 +255,7 @@ const Page = () => {
 
             <button
               type="button"
+              onClick={handleAdd}
               className="mt-4 w-full h-9 rounded-md bg-primary font-bold text-xs uppercase tracking-wider text-white hover:bg-orange-600 transition-colors cursor-pointer"
             >
               Valider la commande
@@ -256,6 +263,12 @@ const Page = () => {
           </div>
         </div>
       </div>
+      <PaymentModal
+        opened={openedAdd}
+        onClose={closeAdd}
+        title="Methode de paiement"
+        size="lg"
+      />
     </div>
   );
 };
