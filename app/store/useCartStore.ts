@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { checkAuth } from "../utils/checkAuth";
-
 interface CartItem {
   id: string;
   name: string;
@@ -11,17 +10,21 @@ interface CartItem {
   stock: number;
 }
 
+interface DestinationItem {
+  city: string;
+  commune: string;
+  adress: string;
+}
+
 interface CartState {
   cart: CartItem[];
 
   // Actions
   addToCart: (product: Omit<CartItem, "quantity">, quantity: number) => void;
+  validPaiement: (form: DestinationItem) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
-
-  // Checkout
-  checkout: () => Promise<{ success: boolean; message: string }>;
 
   // Utilitaires calculés
   getTotalPrice: () => number;
@@ -56,6 +59,57 @@ export const useCartStore = create<CartState>()(
         }
       },
 
+      validPaiement: async (form) => {
+        const isAuthed = await checkAuth();
+        if (!isAuthed) return { success: false, message: "Non authentifié" };
+
+        const currentCart = get().cart;
+        if (currentCart.length === 0)
+          return { success: false, message: "Panier vide" };
+
+        const totalAmount = currentCart.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0,
+        );
+        const order = {
+          totalAmount: totalAmount,
+          status: "PAID",
+          city: form.city,
+          commune: form.commune,
+          address: form.adress,
+        };
+
+        const orderItems = currentCart.map((item) => ({
+          productId: item.id,
+          quantity: item.quantity,
+          price: item.price,
+        }));
+
+        try {
+          const response = await fetch("/api/orders", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              order,
+              orderItems,
+            }),
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            get().clearCart();
+            return { success: true };
+          }
+          return { success: false, message: result.message };
+        } catch (error) {
+          return {
+            success: false,
+            message: "Erreur serveur lors de la commande",
+          };
+        }
+      },
+
       removeFromCart: async (productId) => {
         const isAuthed = await checkAuth();
         if (!isAuthed) return;
@@ -67,6 +121,10 @@ export const useCartStore = create<CartState>()(
       updateQuantity: async (productId, quantity) => {
         const isAuthed = await checkAuth();
         if (!isAuthed) return;
+
+        const product = get().cart.find((item) => item.id === productId);
+        if (!product) return;
+        if (quantity > product.stock) return;
 
         if (quantity <= 0) {
           get().removeFromCart(productId);
@@ -80,37 +138,6 @@ export const useCartStore = create<CartState>()(
       },
 
       clearCart: () => set({ cart: [] }),
-
-      // LOGIQUE DE CHECKOUT
-      checkout: async () => {
-        const isAuthed = await checkAuth();
-        if (!isAuthed)
-          return {
-            success: false,
-            message: "Vous devez être connecté pour commander.",
-          };
-
-        const { cart, clearCart } = get();
-        if (cart.length === 0)
-          return { success: false, message: "Votre panier est vide." };
-
-        try {
-          // Simulation d'une requête API vers ton backend
-          // Ici, tu appelleras une route API type: await fetch('/api/checkout', { method: 'POST', body: JSON.stringify(cart) })
-          console.log("Traitement de la commande pour :", cart);
-
-          await new Promise((resolve) => setTimeout(resolve, 2000)); // Latence de 2s simulée
-
-          // Une fois le paiement validé côté serveur :
-          clearCart();
-          return { success: true, message: "Commande validée avec succès !" };
-        } catch (error) {
-          return {
-            success: false,
-            message: "Erreur lors du paiement. Veuillez réessayer.",
-          };
-        }
-      },
 
       getTotalPrice: () => {
         return get().cart.reduce(

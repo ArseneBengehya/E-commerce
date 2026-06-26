@@ -29,6 +29,14 @@ const Page = () => {
     openAdd();
   };
 
+  const [destination, setDestinatiojn] = useState({
+    city: "",
+    commune: "",
+    adress: "",
+  });
+
+  const isDisabled = !destination.city.trim() || !destination.adress.trim() || !destination.commune.trim() || !cart
+
   // CALCULS DYNAMIQUES BASÉS SUR TON STORE
   const cartTotal = useMemo(() => getTotalPrice(), [cart, getTotalPrice]);
   const deliveryFee = useMemo(() => Math.round(cartTotal * 0.15), [cartTotal]);
@@ -198,6 +206,13 @@ const Page = () => {
                 <label className="font-bold text-slate-700">Ville</label>
                 <input
                   type="text"
+                  value={destination.city || ""}
+                  onChange={(e) =>
+                    setDestinatiojn((prev) => ({
+                      ...prev,
+                      city: e.target.value,
+                    }))
+                  }
                   placeholder="Ex: Bukavu, Goma..."
                   className="w-full h-8 rounded-md border border-slate-200 px-3 outline-none transition focus:border-primary text-slate-800"
                 />
@@ -209,6 +224,13 @@ const Page = () => {
                 </label>
                 <input
                   type="text"
+                  value={destination.commune || ""}
+                  onChange={(e) =>
+                    setDestinatiojn((prev) => ({
+                      ...prev,
+                      commune: e.target.value,
+                    }))
+                  }
                   placeholder="Ex: Ibanda, Ndosho..."
                   className="w-full h-8 rounded-md border border-slate-200 px-3 outline-none transition focus:border-primary text-slate-800"
                 />
@@ -220,6 +242,13 @@ const Page = () => {
                 </label>
                 <input
                   type="text"
+                  value={destination.adress || ""}
+                  onChange={(e) =>
+                    setDestinatiojn((prev) => ({
+                      ...prev,
+                      adress: e.target.value,
+                    }))
+                  }
                   placeholder="Numéro d'avenue, nom de rue, immeuble ou référence claire..."
                   className="w-full h-8 rounded-md border border-slate-200 px-3 outline-none transition focus:border-primary text-slate-800"
                 />
@@ -256,7 +285,8 @@ const Page = () => {
             <button
               type="button"
               onClick={handleAdd}
-              className="mt-4 w-full h-9 rounded-md bg-primary font-bold text-xs uppercase tracking-wider text-white hover:bg-orange-600 transition-colors cursor-pointer"
+              disabled={isDisabled}
+              className={`mt-4 w-full h-9 rounded-md bg-primary font-bold text-xs uppercase tracking-wider text-white hover:bg-orange-600 transition-colors cursor-pointer ${isDisabled ? "!bg-gray-200 !text-black !cursor-not-allowed":""}`}
             >
               Valider la commande
             </button>
@@ -268,6 +298,7 @@ const Page = () => {
         onClose={closeAdd}
         title="Methode de paiement"
         size="lg"
+        form={destination}
       />
     </div>
   );
