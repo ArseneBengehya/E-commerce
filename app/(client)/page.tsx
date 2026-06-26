@@ -82,12 +82,16 @@ export default function Home() {
             </div>
 
             <p className="max-w-md text-muted text-xs">
-              Découvrez nos nouveautés mode exclusives avec des remises uniques, 
+              Découvrez nos nouveautés mode exclusives avec des remises uniques,
               des produits de qualité supérieure et une livraison rapide.
             </p>
 
             <div className="flex items-center gap-4 pt-2">
-              <Button size="md" className="!bg-primary px-6" onClick={() => router.push("/shop")}>
+              <Button
+                size="md"
+                className="!bg-primary px-6"
+                onClick={() => router.push("/shop")}
+              >
                 Acheter Maintenant
               </Button>
               <span className="text-sm font-medium text-muted">
@@ -113,24 +117,28 @@ export default function Home() {
         <p className="font-bold text-md text-primary">Nos </p>{" "}
         <p className="text-md font-bold">Catégories</p>
       </div>
-      
+
       <div className="flex justify-between items-center gap-2 mt-2">
-        {isCategoriesLoading && categories.length === 0 ? (
-          Array.from({ length: 5 }).map((_, index) => (
-            <div key={index} className="py-2 flex-1 bg-gray-100 rounded-lg animate-pulse h-[33px]" />
-          ))
-        ) : (
-          categories.map((item) => (
-            <div
-              key={item.id}
-              className="py-2 flex-1 bg-white border border-gray-100 rounded-lg hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-pointer select-none group"
-            >
-              <p className="text-center text-[11px] text-black font-bold tracking-wide group-hover:scale-102 transition-transform">
-                {item.name}
-              </p>
-            </div>
-          ))
-        )}
+        {isCategoriesLoading && categories.length === 0
+          ? Array.from({ length: 5 }).map((_, index) => (
+              <div
+                key={index}
+                className="py-2 flex-1 bg-gray-100 rounded-lg animate-pulse h-[33px]"
+              />
+            ))
+          : categories.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  router.push(`/shop?id=${item.id}`);
+                }}
+                className="py-2 flex-1 bg-white border border-gray-100 rounded-lg hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-pointer select-none group"
+              >
+                <p className="text-center text-[11px] text-black font-bold tracking-wide group-hover:scale-102 transition-transform">
+                  {item.name}
+                </p>
+              </button>
+            ))}
       </div>
 
       {/* SÉLECTEUR D'ONGLETS */}
@@ -148,24 +156,25 @@ export default function Home() {
 
       {/* GRILLE PRODUITS (VRAIES DONNÉES ET SQUELETTES) */}
       <div className="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {isLoading && products.length === 0 ? (
-          /* Squelettes Produits */
-          Array.from({ length: 8 }).map((_, index) => (
-            <div key={index} className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-50 h-[290px] animate-pulse p-3 space-y-3">
-              <div className="bg-gray-200 h-40 w-full rounded-lg" />
-              <div className="h-4 bg-gray-200 rounded-sm w-3/4" />
-              <div className="flex justify-between items-center">
-                <div className="h-5 bg-gray-200 rounded-sm w-1/4" />
-                <div className="h-4 bg-gray-200 rounded-sm w-1/3" />
+        {isLoading && products.length === 0
+          ? /* Squelettes Produits */
+            Array.from({ length: 8 }).map((_, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-50 h-[290px] animate-pulse p-3 space-y-3"
+              >
+                <div className="bg-gray-200 h-40 w-full rounded-lg" />
+                <div className="h-4 bg-gray-200 rounded-sm w-3/4" />
+                <div className="flex justify-between items-center">
+                  <div className="h-5 bg-gray-200 rounded-sm w-1/4" />
+                  <div className="h-4 bg-gray-200 rounded-sm w-1/3" />
+                </div>
+                <div className="h-8 bg-gray-200 rounded-lg w-full" />
               </div>
-              <div className="h-8 bg-gray-200 rounded-lg w-full" />
-            </div>
-          ))
-        ) : (
-          displayedProducts.map((product) => (
-            <Card key={product.id} product={product} />
-          ))
-        )}
+            ))
+          : displayedProducts.map((product) => (
+              <Card key={product.id} product={product} />
+            ))}
       </div>
     </div>
   );
