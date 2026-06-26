@@ -17,7 +17,7 @@ const Header = () => {
     useDisclosure(false);
 
   const pathname = usePathname();
-  const isHome = pathname === "/";
+  const isHome = pathname === "/" || "/auth";
   const pathSegments = pathname.split("/").filter((segment) => segment !== "");
 
   const navigation = [
@@ -38,7 +38,7 @@ const Header = () => {
     },
     {
       title: "Connexion",
-      link: "#",
+      link: "/auth",
       show: true,
     },
   ];

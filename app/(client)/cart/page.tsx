@@ -124,78 +124,81 @@ const page = () => {
   };
 
   return (
-    <div className="px-3 py-5 lg:px-20">
+<div className="px-4 py-4 lg:px-16 bg-white">
       <div className="mx-auto max-w-7xl">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">Votre panier</h1>
-        <p className="text-sm text-slate-500 mb-8">
-          Vérifiez vos produits, ajustez les quantités, puis passez à la validation.
+        <h1 className="text-xl font-black text-slate-900 tracking-tight">Votre panier</h1>
+        <p className="text-xs text-slate-500 mb-4">
+          Ajustez les quantités, renseignez votre position, puis passez à la validation.
         </p>
 
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        {/* TABLEAU COMPACT & ÉPURÉ */}
+        <div className="overflow-hidden rounded-lg border border-slate-100 bg-white shadow-xs">
           <div className="overflow-x-auto">
-            <table className="min-w-full border-collapse text-left text-sm">
-              <thead className="bg-slate-50 text-slate-500 uppercase tracking-[0.12em] text-xs">
+            <table className="min-w-full border-collapse text-left text-xs">
+              <thead className="bg-slate-50/70 border-b border-slate-100 text-slate-500 font-bold uppercase tracking-wider">
                 <tr>
-                  <th className="px-4 py-4">Produit</th>
-                  <th className="px-4 py-4">Prix unitaire</th>
-                  <th className="px-4 py-4">Quantité</th>
-                  <th className="px-4 py-4">Total</th>
-                  <th className="px-4 py-4">Actions</th>
+                  <th className="px-3 py-2">Produit</th>
+                  <th className="px-3 py-2">Prix</th>
+                  <th className="px-3 py-2">Quantité</th>
+                  <th className="px-3 py-2">Total</th>
+                  <th className="px-3 py-2 text-center w-12">Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                {products.map((product, index) => (
-                  <tr
-                    key={product.id}
-                    className={index % 2 === 0 ? "bg-white" : "bg-slate-50"}
-                  >
-                    <td className="px-4 py-1">
-                      <div className="flex items-center gap-4">
+              <tbody className="divide-y divide-slate-100">
+                {products.map((product) => (
+                  <tr key={product.id} className="hover:bg-slate-50/40 transition-colors">
+                    {/* Infos Produit */}
+                    <td className="px-3 py-1.5">
+                      <div className="flex items-center gap-3">
                         <img
                           src={product.picture}
                           alt={product.name}
-                          className="h-15 w-15 rounded-3xl object-cover border border-slate-200"
+                          className="h-10 w-10 rounded-lg object-cover border border-slate-100 flex-shrink-0"
                         />
                         <div>
-                          <p className="font-semibold text-slate-900">{product.name}</p>
-                          <p className="text-xs text-slate-500 capitalize">{product.category}</p>
+                          <p className="font-bold text-slate-900 line-clamp-1">{product.name}</p>
+                          <p className="text-[10px] text-slate-400 capitalize">{product.category}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-1 font-semibold text-slate-900">
+                    {/* Prix Unitaire */}
+                    <td className="px-3 py-1.5 font-medium text-slate-700">
                       {formatCurrency(product.price)}
                     </td>
-                    <td className="px-4 py-5">
-                      <div className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 shadow-sm">
+                    {/* Contrôle Quantité Compact */}
+                    <td className="px-3 py-1.5">
+                      <div className="inline-flex items-center rounded-md border border-slate-200 h-7 overflow-hidden bg-white">
                         <button
                           type="button"
                           onClick={() => handleQuantityChange(product.id, -1)}
-                          className="h-9 w-9 rounded-l-full bg-white text-slate-600 transition hover:bg-slate-100"
+                          className="px-2 h-full text-slate-500 hover:bg-slate-50 font-bold text-xs transition-colors cursor-pointer"
                         >
                           −
                         </button>
-                        <span className="h-9 w-12 flex items-center justify-center text-sm font-semibold text-slate-900">
+                        <span className="w-8 text-center text-xs font-bold text-slate-800">
                           {product.quantity}
                         </span>
                         <button
                           type="button"
                           onClick={() => handleQuantityChange(product.id, 1)}
-                          className="h-9 w-9 rounded-r-full bg-white text-slate-600 transition hover:bg-slate-100"
+                          className="px-2 h-full text-slate-500 hover:bg-slate-50 font-bold text-xs transition-colors cursor-pointer"
                         >
                           +
                         </button>
                       </div>
                     </td>
-                    <td className="px-4 py-5 font-semibold text-slate-900">
+                    {/* Total par ligne */}
+                    <td className="px-3 py-1.5 font-bold text-slate-900">
                       {formatCurrency(product.price * product.quantity)}
                     </td>
-                    <td className="px-4 py-5">
+                    {/* Action Supprimer */}
+                    <td className="px-3 py-1.5 text-center">
                       <button
                         type="button"
                         onClick={() => setProducts((current) => current.filter((item) => item.id !== product.id))}
-                        className="rounded-full border border-red-200 bg-red-50 px-2 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-100"
+                        className="p-1 rounded-md text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
                       >
-                       <CiTrash size={24}/>
+                        <CiTrash size={16} />
                       </button>
                     </td>
                   </tr>
@@ -204,81 +207,94 @@ const page = () => {
             </table>
           </div>
 
-          <div className="flex flex-col gap-3 border-t border-slate-200 bg-slate-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-            <span className="text-sm text-slate-600">
-              {products.length} article{products.length > 1 ? "s" : ""} dans le panier
+          {/* Actions bas de tableau */}
+          <div className="flex flex-col gap-2 border-t border-slate-100 bg-slate-50/50 px-3 py-2 sm:flex-row sm:items-center sm:justify-between text-xs">
+            <span className="text-slate-500 font-medium">
+              {products.length} article{products.length > 1 ? "s" : ""} sélectionné{products.length > 1 ? "s" : ""}
             </span>
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={handleConfirmUpdate}
-                className="inline-flex items-center justify-center rounded-md bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+                className="rounded-md bg-slate-900 px-3 h-8 font-bold text-white hover:bg-slate-800 transition-colors cursor-pointer"
               >
-                Confirmer la mise à jour
+                Mettre à jour
               </button>
               <button
                 type="button"
                 onClick={() => router.push("/shop")}
-                className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+                className="rounded-md border border-slate-200 bg-white px-3 h-8 font-medium text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer"
               >
-                Continuer à faire du shopping
+                Continuer les achats
               </button>
             </div>
           </div>
         </div>
 
-        <div className="mt-8 grid gap-6 lg:grid-cols-[1.4fr_0.9fr]">
-          <div className="rounded-md border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Calculate shopping</h2>
-            <p className="mb-6 text-sm text-slate-500">
-              Ajoutez un code promo ou une note de livraison pour personnaliser votre commande.
-            </p>
-            <div className="space-y-4">
-              <label className="block text-sm font-medium text-slate-700">
-                Code promotionnel
+        {/* FORMULAIRE DE POSITION & RÉSUMÉ */}
+        <div className="mt-4 grid gap-4 lg:grid-cols-[1.3fr_0.9fr] items-start">
+          
+          {/* FORMULAIRE DE LIVRAISON COMPACT */}
+          <div className="rounded-lg border border-slate-100 bg-white p-4 shadow-2xs">
+            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide mb-1">Informations de livraison</h2>
+            <p className="text-[11px] text-slate-400 mb-4">Indiquez la position exacte pour la réception de votre commande.</p>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700">Ville</label>
                 <input
                   type="text"
-                  value={promoCode}
-                  onChange={(event) => setPromoCode(event.target.value)}
-                  placeholder="Entrez votre code"
-                  className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
+                  placeholder="Ex: Bukavu, Goma..."
+                  className="w-full h-8 rounded-md border border-slate-200 px-3 outline-none transition focus:border-primary text-slate-800"
                 />
-              </label>
-              <label className="block text-sm font-medium text-slate-700">
-                Instructions de livraison
-                <textarea
-                  value={deliveryNote}
-                  onChange={(event) => setDeliveryNote(event.target.value)}
-                  placeholder="Ex : étage, sonnette, point de retrait..."
-                  className="mt-2 min-h-[120px] w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
+              </div>
+              
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700">Commune / Quartier</label>
+                <input
+                  type="text"
+                  placeholder="Ex: Ibanda, Ndosho..."
+                  className="w-full h-8 rounded-md border border-slate-200 px-3 outline-none transition focus:border-primary text-slate-800"
                 />
-              </label>
+              </div>
+
+              <div className="sm:col-span-2 space-y-1">
+                <label className="font-bold text-slate-700">Adresse complète ou repère de position</label>
+                <input
+                  type="text"
+                  placeholder="Numéro d'avenue, nom de rue, immeuble ou référence claire..."
+                  className="w-full h-8 rounded-md border border-slate-200 px-3 outline-none transition focus:border-primary text-slate-800"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="rounded-md border border-slate-200 bg-slate-950 p-6 text-white shadow-sm">
-            <h2 className="text-lg font-semibold text-white mb-4">Résumé de la commande</h2>
-            <div className="space-y-4 text-sm text-slate-300">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          {/* RÉSUMÉ DE LA COMMANDE COMPACT */}
+          <div className="rounded-lg border border-slate-100 bg-slate-900 p-4 text-white shadow-2xs">
+            <h2 className="text-sm font-bold text-white uppercase tracking-wide mb-3">Résumé de la commande</h2>
+            <div className="space-y-2 text-xs text-slate-300">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
                 <span>Sous-total</span>
-                <span>{formatCurrency(cartTotal)}</span>
+                <span className="font-medium text-white">{formatCurrency(cartTotal)}</span>
               </div>
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
                 <span>Frais de livraison</span>
-                <span>{formatCurrency(deliveryFee)}</span>
+                <span className="font-medium text-white">{formatCurrency(deliveryFee)}</span>
               </div>
-              <div className="flex items-center justify-between pt-3 text-base font-semibold text-white">
+              <div className="flex items-center justify-between pt-1 text-sm font-bold text-white">
                 <span>Total estimé</span>
-                <span>{formatCurrency(grandTotal)}</span>
+                <span className="text-base font-black text-white">{formatCurrency(grandTotal)}</span>
               </div>
             </div>
+            
             <button
               type="button"
-              className="mt-6 w-full rounded-md bg-primary px-3 py-2 text-sm font-black uppercase tracking-[0.16em] text-white shadow-xl shadow-primary/20 transition hover:bg-orange-600"
+              className="mt-4 w-full h-9 rounded-md bg-primary font-bold text-xs uppercase tracking-wider text-white hover:bg-orange-600 transition-colors cursor-pointer"
             >
               Valider la commande
             </button>
           </div>
+
         </div>
       </div>
     </div>
