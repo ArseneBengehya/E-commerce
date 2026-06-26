@@ -1,3 +1,4 @@
+"use client"
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -7,6 +8,7 @@ import { ColorSchemeScript, MantineProvider, createTheme } from "@mantine/core";
 import { AppName } from "./utils";
 import { ContextProvider } from "./context";
 import { ToastContainer } from "react-toastify";
+import { SessionProvider } from "next-auth/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,10 +20,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: AppName,
-  description: "Plateforme moderne de commerce et logistique Goma - Bukavu",
-};
+// export const metadata: Metadata = {
+//   title: AppName,
+//   description: "Plateforme moderne de commerce et logistique Goma - Bukavu",
+// };
 
 // Configuration optionnelle du thème Mantine pour s'aligner sur tes choix
 const theme = createTheme({
@@ -48,10 +50,12 @@ export default function RootLayout({
 
       {/* Ton body profite maintenant des transitions fluides configurées dans globals.css */}
       <body className="w-full h-full flex flex-col overflow-hidden text-foreground bg-background">
-        <MantineProvider theme={theme} defaultColorScheme="dark">
-          <ToastContainer/>
+        <SessionProvider>
+          <MantineProvider theme={theme} defaultColorScheme="dark">
+            <ToastContainer />
             <ContextProvider>{children}</ContextProvider>
-        </MantineProvider>
+          </MantineProvider>
+        </SessionProvider>
       </body>
     </html>
   );

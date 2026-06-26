@@ -1,4 +1,5 @@
 "use client";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -29,6 +30,8 @@ const AccountLayout = ({ children }: { children: React.ReactNode }) => {
       icon: <PiShieldCheckLight size={18} />,
     },
   ];
+
+  
 
   const pathname = usePathname();
   const currentNav = navigations.find((item) => pathname === item.link);
@@ -63,7 +66,11 @@ const AccountLayout = ({ children }: { children: React.ReactNode }) => {
 
         {/* Bouton de déconnexion aligné */}
         <div className="mt-2 pt-2 border-t border-slate-100">
-          <button className="w-full flex items-center gap-3 py-2 px-3 text-xs font-bold text-red-500 hover:text-red-600 hover:bg-red-50/60 rounded-lg transition-all cursor-pointer text-left">
+          <button className="w-full flex items-center gap-3 py-2 px-3 text-xs font-bold text-red-500 hover:text-red-600 hover:bg-red-50/60 rounded-lg transition-all cursor-pointer text-left"
+          onClick={()=>{
+            signOut({ redirectTo: "/" })
+          }}
+          >
             <span className="flex items-center justify-center shrink-0">
               <CiLogout size={17} />
             </span>
