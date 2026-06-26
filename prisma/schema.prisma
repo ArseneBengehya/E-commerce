@@ -11,7 +11,6 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
-
 enum OrderStatus {
   PENDING
   PAID
@@ -25,14 +24,16 @@ enum Role {
 
 model User {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  username      String?   @unique 
   name          String?
   email         String?   @unique
+  password      String?  
   emailVerified DateTime?
   image         String?
-  role          Role      @default(CLIENT) // CLIENT ou ADMIN
+  role          Role      @default(CLIENT)
   accounts      Account[]
   sessions      Session[]
-  orders        Order[]   // Liens vers les commandes du client
+  orders        Order[]   
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -67,34 +68,39 @@ model Session {
 model Category {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   name      String    @unique
-  slug      String?    @unique
+  slug      String?   @unique
   products  Product[]
   createdAt DateTime  @default(now())
 }
 
 model Product {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String   
   price       Float
   image       String
   stock       Int
-  categoryId  String   @db.ObjectId
-  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId  String      @db.ObjectId
+  category    Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   orderItems  OrderItem[]
-  createdAt   DateTime @default(now())
+  createdAt   DateTime    @default(now())
 }
 
 model Order {
-  id              String      @id @default(auto()) @map("_id") @db.ObjectId
-  userId          String      @db.ObjectId
-  user            User        @relation(fields: [userId], references: [id])
-  totalAmount     Float
-  status          OrderStatus @default(PENDING) 
-  shippingAddress String     
-  items           OrderItem[]
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String      @db.ObjectId
+  user        User        @relation(fields: [userId], references: [id])
+  totalAmount Float
+  status      OrderStatus @default(PENDING) 
+  
+  // Structure éclatée de la destination (ville, commune, adresse complète) conforme à ton front
+  city        String      
+  commune     String      
+  address     String      
+  
+  items       OrderItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 }
 
 model OrderItem {

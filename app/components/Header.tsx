@@ -2,13 +2,15 @@
 
 import { AppName } from "../utils";
 import { useRouter } from "next/navigation";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure,useMounted } from "@mantine/hooks";
 import { Input } from "@mantine/core";
 import { CiSearch, CiShoppingCart } from "react-icons/ci";
 import { MdChevronRight, MdFavoriteBorder } from "react-icons/md";
 import Link from "next/link";
 // import ThemeSwitcher from "./ThemeSwitcher";
 import { usePathname } from "next/navigation";
+import { useCartStore } from "../store/useCartStore";
+import { useEffect, useState } from "react";
 
 const Header = () => {
   const router = useRouter();
@@ -17,8 +19,12 @@ const Header = () => {
     useDisclosure(false);
 
   const pathname = usePathname();
-  const isHome = pathname === "/" || "/auth";
+  const isHome = pathname === "/" || pathname === "/auth";
   const pathSegments = pathname.split("/").filter((segment) => segment !== "");
+
+  // RÉCUPÉRATION DU COMPTEUR DE PANIER
+  const { getCartCount } = useCartStore();
+const isMounted = useMounted();
 
   const navigation = [
     {
@@ -48,13 +54,15 @@ const Header = () => {
       <div className="flex items-center justify-between px-20">
         {/* name and navigations */}
         <div className="flex justify-between items-center gap-5">
-          <h2>{AppName}</h2>
+          <h2 className="font-black text-lg tracking-tight cursor-pointer" onClick={() => router.push("/")}>
+            {AppName}
+          </h2>
           <div className="flex items-center gap-3">
             {navigation.map((item) => (
               <Link
                 key={item.title}
                 href={item.link}
-                className={`font-bold ${pathname === item.link ? "text-primary" : "text-foreground"}`}
+                className={`font-bold text-xs ${pathname === item.link ? "text-primary" : "text-foreground"}`}
               >
                 {item.title}
               </Link>
@@ -78,19 +86,27 @@ const Header = () => {
             />
           </div>
 
-          {/* ICONS */}
-          <button className="p-1 hover:text-primary transition-colors cursor-pointer "
-          onClick={()=>{
-            router.push("/cart")
-          }}
+          {/* ICON CART AVEC BADGE DYNAMIQUE */}
+          <button
+            className="p-1 hover:text-primary transition-colors cursor-pointer relative"
+            onClick={() => {
+              router.push("/cart");
+            }}
           >
             <CiShoppingCart size={20} />
+            {isMounted && getCartCount() > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white font-black text-[9px] h-4 w-4 rounded-full flex items-center justify-center animate-scaleIn shadow-2xs">
+                {getCartCount()}
+              </span>
+            )}
           </button>
 
-          <button className="p-1 hover:text-primary transition-colors cursor-pointer"
-                    onClick={()=>{
-            router.push("/favorite")
-          }}
+          {/* ICON FAVORIS */}
+          <button
+            className="p-1 hover:text-primary transition-colors cursor-pointer"
+            onClick={() => {
+              router.push("/favorite");
+            }}
           >
             <MdFavoriteBorder size={18} />
           </button>

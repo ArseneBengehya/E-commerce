@@ -1,5 +1,6 @@
 "use client";
 
+import { useProductStore } from "@/app/store/useProductStore";
 import { useParams, useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { CiShoppingCart } from "react-icons/ci";
@@ -24,54 +25,52 @@ const ProductDetailsPage = () => {
   const { id } = useParams();
   const router = useRouter();
   const [quantity, setQuantity] = useState<number>(1);
-
-  const fakeCategories: Category[] = [
-    { id: "1", name: "Tout explorer", slug: "all", icon: "✨" },
-    { id: "2", name: "Électronique & Tech", slug: "tech", icon: "💻" },
-    { id: "3", name: "Mode & Vêtements", slug: "fashion", icon: "🧥" },
-    { id: "4", name: "Maison & Électroménager", slug: "home", icon: "🏠" },
-    { id: "5", name: "Cosmétique & Beauté", slug: "beauty", icon: "🧴" },
-  ];
-
-  const fakeProducts: Product[] = [
-    { id: "1", name: "iPhone 15 Pro Max", price: 1299, image: "https://images.unsplash.com/photo-1696446701215-9f1c8b5c8c3b?w=600", category: "tech" },
-    { id: "2", name: "MacBook Pro M3", price: 1999, image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600", category: "tech" },
-    { id: "3", name: "Nike Air Force 1", price: 120, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600", category: "fashion" },
-    { id: "4", name: "Sac Louis Style", price: 89, image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600", category: "fashion" },
-    { id: "5", name: "Blender Cuisine Pro", price: 150, image: "https://images.unsplash.com/photo-1581600140682-d4e68c8cde32?w=600", category: "home" },
-    { id: "6", name: "Lampe LED Smart", price: 45, image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=600", category: "home" },
-    { id: "7", name: "Crème Hydratante Bio", price: 35, image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600", category: "beauty" },
-    { id: "8", name: "Parfum Élégance", price: 120, image: "https://images.unsplash.com/photo-1615634260167-c8cdede054de?w=600", category: "beauty" },
-  ];
+  const { products, metadata, isLoading, fetchProducts,categories, fetchCategories, isCategoriesLoading } = useProductStore();
 
   // Recherche du produit correspondant à l'ID de l'URL
-  const product = fakeProducts.find((p) => p.id === id);
+  const product = products.find((p) => p.id === id);
 
   // Si le produit n'existe pas
   if (!product) {
     return (
       <div className="w-full max-w-7xl mx-auto px-4 py-12 text-center space-y-3">
-        <p className="text-xs font-bold text-muted uppercase tracking-wider">Produit introuvable</p>
-        <button onClick={() => router.back()} className="text-[11px] font-bold text-primary flex items-center justify-center gap-1 mx-auto cursor-pointer">
+        <p className="text-xs font-bold text-muted uppercase tracking-wider">
+          Produit introuvable
+        </p>
+        <button
+          onClick={() => router.back()}
+          className="text-[11px] font-bold text-primary flex items-center justify-center gap-1 mx-auto cursor-pointer"
+        >
           <MdArrowBack size={14} /> Retourner à la boutique
         </button>
       </div>
     );
   }
 
-  // Trouve le nom lisible de la catégorie
-  const productCategory = fakeCategories.find((c) => c.slug === product.category);
+  // Détermine le slug de la catégorie du produit
+  const productCategorySlug =
+    typeof product.category === "string"
+      ? product.category
+      : product.category?.slug ?? "";
 
-  const similarProducts = fakeProducts.filter(
-    (p) => p.category === product.category && p.id !== product.id
+  const productCategory = categories.find(
+    (c) => c.slug === productCategorySlug,
   );
+
+  const similarProducts = products.filter((p) => {
+    const pCategorySlug =
+      typeof p.category === "string"
+        ? p.category
+        : p.category?.slug ?? "";
+
+    return pCategorySlug === productCategorySlug && p.id !== product.id;
+  });
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      
       {/* BOUTON RETOUR DISCRET */}
-      <button 
-        onClick={() => router.back()} 
+      <button
+        onClick={() => router.back()}
         className="mb-5 inline-flex items-center gap-1 text-[10px] font-bold text-muted uppercase tracking-wide hover:text-primary transition-colors cursor-pointer"
       >
         <MdArrowBack size={14} /> Retour
@@ -79,7 +78,6 @@ const ProductDetailsPage = () => {
 
       {/* DISPOSITION ASYMÉTRIQUE EN 2 COLONNES */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-start">
-        
         {/* COLONNE GAUCHE : PHOTO DU PRODUIT */}
         <div className="w-full aspect-square max-h-[460px] rounded-xl overflow-hidden  border border-border/40 relative shadow-2xs group">
           <img
@@ -118,13 +116,15 @@ const ProductDetailsPage = () => {
 
           {/* DESCRIPTION COMPACTE FACTICE */}
           <p className="text-xs text-muted-foreground leading-relaxed max-w-md">
-            Découvrez l'excellence avec cet article minutieusement sélectionné. Alliant robustesse, design ergonomique et performances haut de gamme, il répondra parfaitement à vos exigences quotidiennes.
+            Découvrez l'excellence avec cet article minutieusement sélectionné.
+            Alliant robustesse, design ergonomique et performances haut de
+            gamme, il répondra parfaitement à vos exigences quotidiennes.
           </p>
 
           {/* SÉLECTEUR DE QUANTITÉ & FAVORIS */}
           <div className="flex items-center gap-3 mt-2">
             <div className="flex items-center border border-border/60  rounded-lg h-9 overflow-hidden">
-              <button 
+              <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 className="px-3 text-zinc-500 h-full font-bold transition-colors text-xs"
               >
@@ -133,7 +133,7 @@ const ProductDetailsPage = () => {
               <span className="px-3 text-xs font-bold text-foreground min-w-[32px] text-center">
                 {quantity}
               </span>
-              <button 
+              <button
                 onClick={() => setQuantity(quantity + 1)}
                 className="px-3 text-zinc-500  h-full font-bold transition-colors text-xs"
               >
@@ -153,7 +153,6 @@ const ProductDetailsPage = () => {
               <CiShoppingCart size={20} className="stroke-1" />
             </button>
           </div>
-
         </div>
       </div>
       {similarProducts.length > 0 && (
@@ -190,8 +189,12 @@ const ProductDetailsPage = () => {
                     {similar.name}
                   </h4>
                   <div className="flex justify-between items-center text-[10px]">
-                    <p className="font-black text-foreground text-xs">${similar.price}</p>
-                    <span className="text-zinc-400 font-medium">Voir l'article</span>
+                    <p className="font-black text-foreground text-xs">
+                      ${similar.price}
+                    </p>
+                    <span className="text-zinc-400 font-medium">
+                      Voir l'article
+                    </span>
                   </div>
                 </div>
               </div>
