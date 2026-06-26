@@ -1,7 +1,7 @@
 "use client";
 import { AppName } from "../utils";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { FaCcVisa, FaCcMastercard, FaCcPaypal } from "react-icons/fa";
 import { useProductStore } from "../store/useProductStore";
 import { useRouter } from "next/navigation";
@@ -9,7 +9,11 @@ import { useRouter } from "next/navigation";
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const { categories, fetchCategories } = useProductStore();
-  const [randomCategories, setRandomCategories] = useState<any[]>([]);
+  const randomCategories = useMemo(() => {
+    if (categories.length === 0) return [];
+    const shuffled = [...categories].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 2);
+  }, [categories]);
 
   useEffect(() => {
     if (categories.length === 0) {
@@ -17,14 +21,6 @@ const Footer = () => {
     }
   }, [fetchCategories, categories.length]);
   const router = useRouter()
-
-  useEffect(() => {
-    if (categories.length > 0) {
-      // Mélange et sélectionne 2 catégories au hasard
-      const shuffled = [...categories].sort(() => 0.5 - Math.random());
-      setRandomCategories(shuffled.slice(0, 2));
-    }
-  }, [categories]);
 
   return (
     <footer className="w-full bg-zinc-950 text-zinc-400 text-[11px] border-t border-zinc-800/50">

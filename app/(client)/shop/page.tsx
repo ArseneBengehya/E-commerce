@@ -16,12 +16,11 @@ export default function Page() {
     isCategoriesLoading,
   } = useProductStore();
 
-  // État pour traquer la catégorie active (null ou ID de la catégorie)
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
-    null,
-  );
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
+    id ?? null,
+  );
 
   useEffect(() => {
     if (products.length === 0) {
@@ -42,11 +41,7 @@ export default function Page() {
     }
   };
 
-useEffect(() => {
-  if (id) {
-    setSelectedCategoryId(id);
-  }
-}, [id, setSelectedCategoryId]);
+// No effect needed to sync id -> selectedCategoryId because we initialize state from the param
 
   // LOGIQUE DE FILTRAGE CÔTÉ CLIENT
   const filteredProducts = useMemo(() => {

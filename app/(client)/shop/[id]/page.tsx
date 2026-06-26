@@ -1,10 +1,13 @@
 "use client";
 
+import { useCartStore } from "@/app/store/useCartStore";
+import { useFavoriteStore } from "@/app/store/useFavoriteStore";
 import { useProductStore } from "@/app/store/useProductStore";
+import { useMounted } from "@mantine/hooks";
 import { useParams, useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { CiShoppingCart } from "react-icons/ci";
-import { MdFavoriteBorder, MdArrowBack } from "react-icons/md";
+import { MdFavoriteBorder, MdArrowBack, MdFavorite } from "react-icons/md";
 
 type Category = {
   id: string;
@@ -25,7 +28,15 @@ const ProductDetailsPage = () => {
   const { id } = useParams();
   const router = useRouter();
   const [quantity, setQuantity] = useState<number>(1);
-  const { products, metadata, isLoading, fetchProducts,categories, fetchCategories, isCategoriesLoading } = useProductStore();
+  const {
+    products,
+    metadata,
+    isLoading,
+    fetchProducts,
+    categories,
+    fetchCategories,
+    isCategoriesLoading,
+  } = useProductStore();
 
   // Recherche du produit correspondant à l'ID de l'URL
   const product = products.find((p) => p.id === id);
@@ -51,7 +62,7 @@ const ProductDetailsPage = () => {
   const productCategorySlug =
     typeof product.category === "string"
       ? product.category
-      : product.category?.slug ?? "";
+      : (product.category?.slug ?? "");
 
   const productCategory = categories.find(
     (c) => c.slug === productCategorySlug,
@@ -59,12 +70,16 @@ const ProductDetailsPage = () => {
 
   const similarProducts = products.filter((p) => {
     const pCategorySlug =
-      typeof p.category === "string"
-        ? p.category
-        : p.category?.slug ?? "";
+      typeof p.category === "string" ? p.category : (p.category?.slug ?? "");
 
     return pCategorySlug === productCategorySlug && p.id !== product.id;
   });
+
+  const { toggleFavorite, isFavorite } = useFavoriteStore();
+  const isMounted = useMounted();
+  const hasFavorite = isMounted ? isFavorite(product.id) : false;
+
+  const { addToCart } = useCartStore();
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -116,9 +131,7 @@ const ProductDetailsPage = () => {
 
           {/* DESCRIPTION COMPACTE FACTICE */}
           <p className="text-xs text-muted-foreground leading-relaxed max-w-md">
-            Découvrez l'excellence avec cet article minutieusement sélectionné.
-            Alliant robustesse, design ergonomique et performances haut de
-            gamme, il répondra parfaitement à vos exigences quotidiennes.
+            {product.description}
           </p>
 
           {/* SÉLECTEUR DE QUANTITÉ & FAVORIS */}
@@ -141,16 +154,55 @@ const ProductDetailsPage = () => {
               </button>
             </div>
 
-            <button className="h-9 w-9 flex items-center justify-center border border-border/60  hover:border-red-500/50 hover:text-red-500 text-zinc-600 dark:text-zinc-400 rounded-lg shadow-2xs transition-all cursor-pointer">
-              <MdFavoriteBorder size={18} />
+            <button
+              type="button"
+              className="p-1.5 rounded-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xs shadow-2xs transition-all cursor-pointer z-10"
+              onClick={(e) => {
+                e.stopPropagation(); // Empêche la redirection vers les détails
+                toggleFavorite({
+                  id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  image: product.image,
+                  stock: product.stock,
+                });
+              }}
+            >
+              {hasFavorite ? (
+                <MdFavorite
+                  size={15}
+                  className="text-red-500 scale-110 transition-transform"
+                />
+              ) : (
+                <MdFavoriteBorder
+                  size={15}
+                  className="text-zinc-700 dark:text-zinc-300 hover:text-red-500 transition-colors"
+                />
+              )}
             </button>
           </div>
 
           {/* ACTION PRINCIPALE : PANIER */}
           <div className="mt-2 pt-2 max-w-md">
-            <button className="w-full h-10 flex items-center gap-2 justify-center bg-primary hover:bg-orange-600 active:scale-[0.99] text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-md cursor-pointer">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation(); // Empêche la redirection vers les détails
+                addToCart(
+                  {
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                    stock: product.stock,
+                  },
+                  quantity,
+                );
+              }}
+              className="w-full flex items-center gap-1.5 justify-center bg-primary hover:bg-orange-600 active:scale-[0.98] text-white text-[11px] font-bold py-1.5 rounded-lg transition-all cursor-pointer shadow-2xs"
+            >
               <span>Ajouter au panier</span>
-              <CiShoppingCart size={20} className="stroke-1" />
+              <CiShoppingCart size={16} />
             </button>
           </div>
         </div>

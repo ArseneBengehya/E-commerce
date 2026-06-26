@@ -20,7 +20,7 @@ interface ProductProps {
 export const Card = ({ product }: ProductProps) => {
   const router = useRouter();
   const { addToCart } = useCartStore();
-  
+
   // CONNEXION AU STORE DES FAVORIS
   const { toggleFavorite, isFavorite } = useFavoriteStore();
 
@@ -61,9 +61,15 @@ export const Card = ({ product }: ProductProps) => {
           }}
         >
           {hasFavorite ? (
-            <MdFavorite size={15} className="text-red-500 scale-110 transition-transform" />
+            <MdFavorite
+              size={15}
+              className="text-red-500 scale-110 transition-transform"
+            />
           ) : (
-            <MdFavoriteBorder size={15} className="text-zinc-700 dark:text-zinc-300 hover:text-red-500 transition-colors" />
+            <MdFavoriteBorder
+              size={15}
+              className="text-zinc-700 dark:text-zinc-300 hover:text-red-500 transition-colors"
+            />
           )}
         </button>
       </div>
@@ -90,13 +96,16 @@ export const Card = ({ product }: ProductProps) => {
           type="button"
           onClick={(e) => {
             e.stopPropagation(); // Empêche la redirection vers les détails
-            addToCart({
-              id: product.id,
-              name: product.name,
-              price: product.price,
-              image: product.image,
-              stock: productStock,
-            });
+            addToCart(
+              {
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                image: product.image,
+                stock: productStock,
+              },
+              1,
+            );
           }}
           className="w-full flex items-center gap-1.5 justify-center bg-primary hover:bg-orange-600 active:scale-[0.98] text-white text-[11px] font-bold py-1.5 rounded-lg transition-all cursor-pointer shadow-2xs"
         >

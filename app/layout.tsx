@@ -9,6 +9,7 @@ import { AppName } from "./utils";
 import { ContextProvider } from "./context";
 import { ToastContainer } from "react-toastify";
 import { SessionProvider } from "next-auth/react";
+import { Notifications } from "@mantine/notifications";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -53,6 +54,7 @@ export default function RootLayout({
         <SessionProvider>
           <MantineProvider theme={theme} defaultColorScheme="dark">
             <ToastContainer />
+            <Notifications position="top-right" />
             <ContextProvider>{children}</ContextProvider>
           </MantineProvider>
         </SessionProvider>

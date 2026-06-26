@@ -9,6 +9,7 @@ import { MdChevronRight, MdFavoriteBorder } from "react-icons/md";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useCartStore } from "../store/useCartStore";
+import { useAuthStore } from "../store/useAuthStore";
 
 const Header = () => {
   const router = useRouter();
@@ -16,6 +17,7 @@ const Header = () => {
   const [isMounted] = [useMounted()];
   const { getCartCount } = useCartStore();
   const pathname = usePathname();
+  const { isAuthPopoverOpen, closeAuthPopover } = useAuthStore();
 
   const isHome = pathname === "/" || pathname === "/auth";
   const pathSegments = pathname.split("/").filter((segment) => segment !== "");
