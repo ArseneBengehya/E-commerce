@@ -1,16 +1,40 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
-interface Category { id: string; name: string; slug: string | null; }
-interface Product { id: string; name: string; description: string; price: number; image: string; stock: number; categoryId: string; category: Category; }
-interface Metadata { totalProducts: number; totalPages: number; currentPage: number; limit: number; hasNextPage: boolean; hasPrevPage: boolean; }
+interface Category {
+  id: string;
+  name: string;
+  slug: string | null;
+}
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  stock: number;
+  categoryId: string;
+  category: Category;
+}
+interface Metadata {
+  totalProducts: number;
+  totalPages: number;
+  currentPage: number;
+  limit: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
 
 interface ProductState {
   products: Product[];
   categories: Category[];
   metadata: Metadata | null;
   isLoading: boolean;
-  fetchProducts: (page?: number, limit?: number, loadMore?: boolean) => Promise<void>;
+  fetchProducts: (
+    page?: number,
+    limit?: number,
+    loadMore?: boolean,
+  ) => Promise<void>;
   fetchCategories: () => Promise<void>;
   addProduct: (product: any) => Promise<void>;
   updateStock: (id: string, stock: number) => Promise<void>;
@@ -31,7 +55,9 @@ export const useProductStore = create<ProductState>()(
         const res = await fetch(`/api/products?page=${page}&limit=${limit}`);
         const result = await res.json();
         set({
-          products: loadMore ? [...get().products, ...result.data] : result.data,
+          products: loadMore
+            ? [...get().products, ...result.data]
+            : result.data,
           metadata: result.metadata,
           isLoading: false,
         });
@@ -44,22 +70,36 @@ export const useProductStore = create<ProductState>()(
       },
 
       addProduct: async (newProduct) => {
-        const res = await fetch("/api/products", { method: "POST", body: JSON.stringify(newProduct) });
-        if (res.ok) await get().fetchProducts();
+        const res = await fetch("/api/products", {
+          method: "POST",
+          body: JSON.stringify(newProduct),
+        });
+        if (res.ok) {
+          // Re-fetch pour mettre à jour la liste complète
+          get().fetchProducts();
+        }
       },
 
       updateStock: async (id, stock) => {
-        await fetch("/api/products", { method: "PATCH", body: JSON.stringify({ id, stock }) });
-        set({ products: get().products.map(p => p.id === id ? { ...p, stock } : p) });
+        await fetch("/api/products", {
+          method: "PATCH",
+          body: JSON.stringify({ id, stock }),
+        });
+        set({
+          products: get().products.map((p) =>
+            p.id === id ? { ...p, stock } : p,
+          ),
+        });
       },
 
       deleteProduct: async (id) => {
         await fetch(`/api/products?id=${id}`, { method: "DELETE" });
-        set({ products: get().products.filter(p => p.id !== id) });
+        set({ products: get().products.filter((p) => p.id !== id) });
       },
 
-      clearProducts: () => set({ products: [], categories: [], metadata: null }),
+      clearProducts: () =>
+        set({ products: [], categories: [], metadata: null }),
     }),
-    { name: "product-storage", storage: createJSONStorage(() => localStorage) }
-  )
+    { name: "product-storage", storage: createJSONStorage(() => localStorage) },
+  ),
 );
