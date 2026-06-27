@@ -75,7 +75,6 @@ export const useProductStore = create<ProductState>()(
           body: JSON.stringify(newProduct),
         });
         if (res.ok) {
-          // Re-fetch pour mettre à jour la liste complète
           get().fetchProducts();
         }
       },

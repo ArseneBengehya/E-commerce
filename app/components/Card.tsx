@@ -85,8 +85,14 @@ export const Card = ({ product }: ProductProps) => {
             <p className="font-black text-foreground text-sm">
               ${product.price}
             </p>
-            <p className="text-emerald-600 dark:text-emerald-500 font-semibold bg-emerald-500/10 px-1.5 py-0.5 rounded-md text-[10px]">
-              Disponible
+            <p
+              className={`font-semibold px-1.5 py-0.5 rounded-md text-[10px] w-fit ${
+                product.stock > 0
+                  ? "text-emerald-600 dark:text-emerald-500 bg-emerald-500/10"
+                  : "text-rose-600 dark:text-rose-500 bg-rose-500/10"
+              }`}
+            >
+              {product.stock > 0 ? "Disponible" : "Rupture de stock"}
             </p>
           </div>
         </div>

@@ -6,6 +6,7 @@ import { CiShoppingCart } from "react-icons/ci";
 import { MdFavoriteBorder } from "react-icons/md";
 import { useProductStore } from "../store/useProductStore";
 import { Card } from "../components/Card";
+import { useCartStore } from "../store/useCartStore";
 
 export default function Home() {
   const {
@@ -17,11 +18,13 @@ export default function Home() {
     isCategoriesLoading,
   } = useProductStore();
 
+  const {cart} = useCartStore()
+
   useEffect(() => {
     if (products.length === 0) {
       fetchProducts(1, 100, false);
     }
-  }, [fetchProducts, products.length]);
+  }, [fetchProducts, products.length, cart]);
 
   useEffect(() => {
     if (categories.length === 0) {

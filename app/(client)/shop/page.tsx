@@ -1,6 +1,7 @@
 "use client";
 
 import { Card } from "@/app/components/Card";
+import { useCartStore } from "@/app/store/useCartStore";
 import { useProductStore } from "@/app/store/useProductStore";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState, useMemo } from "react";
@@ -16,6 +17,8 @@ export default function Page() {
     isCategoriesLoading,
   } = useProductStore();
 
+    const {cart} = useCartStore()
+
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
@@ -26,7 +29,7 @@ export default function Page() {
     if (products.length === 0) {
       fetchProducts(1, 50, false);
     }
-  }, [fetchProducts, products.length]);
+  }, [fetchProducts, products.length, cart]);
 
   useEffect(() => {
     if (categories.length === 0) {

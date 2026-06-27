@@ -35,7 +35,7 @@ export default function ProductsAdminPage() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <div className="flex justify-between items-center">
+      {/* <div className="flex justify-between items-center">
         <div>
           <h1 className="text-sm font-black text-slate-900 uppercase tracking-wide">Gestion du catalogue</h1>
           <p className="text-[11px] text-slate-400">Ajoutez, modifiez ou retirez vos produits.</p>
@@ -46,7 +46,7 @@ export default function ProductsAdminPage() {
         >
            Nouveau Produit
         </button>
-      </div>
+      </div> */}
 
       <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
         <table className="w-full text-left text-xs">
