@@ -20,6 +20,6 @@ export async function GET() {
     return NextResponse.json(
       { message: "Erreur serveur lors de la récupération des catégories" },
       { status: 500 }
-    );
+    )
   }
 }
