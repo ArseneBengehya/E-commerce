@@ -124,9 +124,15 @@ const ProductDetailsPage = () => {
             <span className="text-2xl font-black text-foreground">
               ${product.price}
             </span>
-            <span className="text-emerald-600 dark:text-emerald-500 font-bold bg-emerald-500/10 px-2 py-0.5 rounded-md text-[10px] tracking-wide uppercase">
-              Disponible en stock
-            </span>
+            <p
+              className={`font-semibold px-1.5 py-0.5 rounded-md text-[10px] w-fit ${
+                product.stock > 0
+                  ? "text-emerald-600 dark:text-emerald-500 bg-emerald-500/10"
+                  : "text-rose-600 dark:text-rose-500 bg-rose-500/10"
+              }`}
+            >
+              {product.stock > 0 ? "Disponible" : "Rupture de stock"}
+            </p>
           </div>
 
           {/* DESCRIPTION COMPACTE FACTICE */}
@@ -186,8 +192,12 @@ const ProductDetailsPage = () => {
           <div className="mt-2 pt-2 max-w-md">
             <button
               type="button"
+              disabled={product.stock <= 0}
               onClick={(e) => {
-                e.stopPropagation(); // Empêche la redirection vers les détails
+                e.stopPropagation();
+
+                if (product.stock <= 0) return;
+
                 addToCart(
                   {
                     id: product.id,
@@ -199,9 +209,17 @@ const ProductDetailsPage = () => {
                   quantity,
                 );
               }}
-              className="w-full flex items-center gap-1.5 justify-center bg-primary hover:bg-orange-600 active:scale-[0.98] text-white text-[11px] font-bold py-1.5 rounded-lg transition-all cursor-pointer shadow-2xs"
+              className={`w-full flex items-center gap-1.5 justify-center text-white text-[11px] font-bold py-1.5 rounded-lg transition-all shadow-2xs ${
+                product.stock > 0
+                  ? "bg-primary hover:bg-orange-600 active:scale-[0.98] cursor-pointer"
+                  : "bg-zinc-400 cursor-not-allowed opacity-70"
+              }`}
             >
-              <span>Ajouter au panier</span>
+              <span>
+                {product.stock > 0
+                  ? "Ajouter au panier"
+                  : "Produit indisponible"}
+              </span>
               <CiShoppingCart size={16} />
             </button>
           </div>

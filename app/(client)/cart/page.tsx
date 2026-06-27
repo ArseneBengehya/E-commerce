@@ -35,7 +35,11 @@ const Page = () => {
     adress: "",
   });
 
-  const isDisabled = !destination.city.trim() || !destination.adress.trim() || !destination.commune.trim() || !cart
+  const isDisabled =
+    !destination.city.trim() ||
+    !destination.adress.trim() ||
+    !destination.commune.trim() ||
+    !cart;
 
   // CALCULS DYNAMIQUES BASÉS SUR TON STORE
   const cartTotal = useMemo(() => getTotalPrice(), [cart, getTotalPrice]);
@@ -116,8 +120,16 @@ const Page = () => {
                           <p className="font-bold text-slate-900 line-clamp-1">
                             {product.name}
                           </p>
-                          <p className="text-[10px] text-emerald-600 font-semibold">
-                            En stock
+                          <p
+                            className={`font-semibold px-1.5 py-0.5 rounded-md text-[10px] w-fit ${
+                              product.stock > 0
+                                ? "text-emerald-600 dark:text-emerald-500 bg-emerald-500/10"
+                                : "text-rose-600 dark:text-rose-500 bg-rose-500/10"
+                            }`}
+                          >
+                            {product.stock > 0
+                              ? "Disponible"
+                              : "Rupture de stock"}
                           </p>
                         </div>
                       </div>
@@ -286,7 +298,7 @@ const Page = () => {
               type="button"
               onClick={handleAdd}
               disabled={isDisabled}
-              className={`mt-4 w-full h-9 rounded-md bg-primary font-bold text-xs uppercase tracking-wider text-white hover:bg-orange-600 transition-colors cursor-pointer ${isDisabled ? "!bg-gray-200 !text-black !cursor-not-allowed":""}`}
+              className={`mt-4 w-full h-9 rounded-md bg-primary font-bold text-xs uppercase tracking-wider text-white hover:bg-orange-600 transition-colors cursor-pointer ${isDisabled ? "!bg-gray-200 !text-black !cursor-not-allowed" : ""}`}
             >
               Valider la commande
             </button>

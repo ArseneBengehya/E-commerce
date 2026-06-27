@@ -98,25 +98,36 @@ export const Card = ({ product }: ProductProps) => {
         </div>
 
         {/* BOUTON D'ACTION AJOUTER AU PANIER */}
+        {/* BOUTON D'ACTION AJOUTER AU PANIER */}
         <button
           type="button"
+          disabled={product.stock === 0} // Désactive le bouton si stock est 0
           onClick={(e) => {
-            e.stopPropagation(); // Empêche la redirection vers les détails
-            addToCart(
-              {
-                id: product.id,
-                name: product.name,
-                price: product.price,
-                image: product.image,
-                stock: productStock,
-              },
-              1,
-            );
+            e.stopPropagation();
+            // Condition de sécurité supplémentaire (bien que 'disabled' suffise)
+            if (product.stock > 0) {
+              addToCart(
+                {
+                  id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  image: product.image,
+                  stock: productStock,
+                },
+                1,
+              );
+            }
           }}
-          className="w-full flex items-center gap-1.5 justify-center bg-primary hover:bg-orange-600 active:scale-[0.98] text-white text-[11px] font-bold py-1.5 rounded-lg transition-all cursor-pointer shadow-2xs"
+          className={`w-full flex items-center gap-1.5 justify-center text-white text-[11px] font-bold py-1.5 rounded-lg transition-all shadow-2xs ${
+            product.stock > 0
+              ? "bg-primary hover:bg-orange-600 active:scale-[0.98] cursor-pointer"
+              : "bg-gray-300 cursor-not-allowed opacity-70"
+          }`}
         >
-          <span>Ajouter au panier</span>
-          <CiShoppingCart size={16} />
+          <span>
+            {product.stock > 0 ? "Ajouter au panier" : "Indisponible"}
+          </span>
+          {product.stock > 0 && <CiShoppingCart size={16} />}
         </button>
       </div>
     </div>

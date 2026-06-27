@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { checkAuth } from "../utils/checkAuth";
+import { useProductStore } from "./useProductStore";
 interface CartItem {
   id: string;
   name: string;
@@ -100,6 +101,7 @@ export const useCartStore = create<CartState>()(
 
           if (result.success) {
             get().clearCart();
+            await useProductStore.getState().fetchProducts();
             return { success: true };
           }
           return { success: false, message: result.message };

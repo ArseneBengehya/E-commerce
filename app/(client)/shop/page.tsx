@@ -17,7 +17,7 @@ export default function Page() {
     isCategoriesLoading,
   } = useProductStore();
 
-    const {cart} = useCartStore()
+  const { cart } = useCartStore();
 
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
@@ -26,10 +26,8 @@ export default function Page() {
   );
 
   useEffect(() => {
-    if (products.length === 0) {
-      fetchProducts(1, 50, false);
-    }
-  }, [fetchProducts, products.length, cart]);
+    fetchProducts(1, 50, false);
+  }, []);
 
   useEffect(() => {
     if (categories.length === 0) {
@@ -44,7 +42,7 @@ export default function Page() {
     }
   };
 
-// No effect needed to sync id -> selectedCategoryId because we initialize state from the param
+  // No effect needed to sync id -> selectedCategoryId because we initialize state from the param
 
   // LOGIQUE DE FILTRAGE CÔTÉ CLIENT
   const filteredProducts = useMemo(() => {

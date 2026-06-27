@@ -18,13 +18,11 @@ export default function Home() {
     isCategoriesLoading,
   } = useProductStore();
 
-  const {cart} = useCartStore()
+  const { cart } = useCartStore();
 
   useEffect(() => {
-    if (products.length === 0) {
-      fetchProducts(1, 100, false);
-    }
-  }, [fetchProducts, products.length, cart]);
+    fetchProducts(1, 100, false);
+  }, []);
 
   useEffect(() => {
     if (categories.length === 0) {

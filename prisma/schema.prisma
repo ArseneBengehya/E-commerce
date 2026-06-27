@@ -29,6 +29,7 @@ model User {
   email         String?   @unique
   image         String?
   role          Role      @default(CLIENT)
+  emailVerified DateTime? 
   
   accounts      Account[]
   sessions      Session[]

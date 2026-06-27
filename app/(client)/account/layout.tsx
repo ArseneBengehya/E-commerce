@@ -9,47 +9,22 @@ import { GoHome, GoPackage, GoPeople, GoTag } from "react-icons/go";
 const AccountLayout = ({ children }: { children: React.ReactNode }) => {
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === "ADMIN";
+
   const navigations = [
-    {
-      title: "Dashboard",
-      link: "/account",
-      icon: <GoHome size={17} />,
-      view: isAdmin,
-    },
-    {
-      title: "Mes commandes",
-      link: "/account/orders",
-      icon: <CiShoppingCart size={18} />,
-      view: isAdmin,
-    },
-    {
-      title: "Profile",
-      link: "/account/profil",
-      icon: <CiUser size={18} />,
-      view: isAdmin,
-    },
-    {
-      title: "Utilisateurs",
-      link: "/account/users",
-      icon: <GoPeople size={18} />,
-      view: isAdmin,
-    },
-    // {
-    //   title: "Categories",
-    //   link: "/account/categories",
-    //   icon: <GoTag size={18} />,
-    //   view: isAdmin,
-    // },
-    {
-      title: "Produits",
-      link: "/account/products",
-      icon: <GoPackage size={18} />,
-      view: isAdmin,
-    },
+    { title: "Dashboard", link: "/account", icon: <GoHome size={17} />, adminOnly: false },
+    { title: "Mes commandes", link: "/account/orders", icon: <CiShoppingCart size={18} />, adminOnly: false },
+    { title: "Profile", link: "/account/profil", icon: <CiUser size={18} />, adminOnly: false },
+    { title: "Categories", link: "/account/categories", icon: <GoTag size={18} />, adminOnly: true },
+    { title: "Produits", link: "/account/products", icon: <GoPackage size={18} />, adminOnly: true },
+    { title: "Utilisateurs", link: "/account/users", icon: <GoPeople size={18} />, adminOnly: true },
   ];
 
+  const visibleNavigations = navigations.filter(
+    (item) => !item.adminOnly || isAdmin
+  );
+
   const pathname = usePathname();
-  const currentNav = navigations.find((item) => pathname === item.link);
+  const currentNav = visibleNavigations.find((item) => pathname === item.link);
   const pageTitle = currentNav ? currentNav.title : "Mon compte";
 
   return (
@@ -57,7 +32,7 @@ const AccountLayout = ({ children }: { children: React.ReactNode }) => {
       {/* SIDEBAR COMPACTE & ÉPURÉE */}
       <div className="w-full md:w-60 border border-slate-100 rounded-xl p-2 bg-white shadow-xs shrink-0">
         <div className="space-y-1">
-          {navigations.map((item) => {
+          {visibleNavigations.map((item) => {
             const isActive = pathname === item.link;
             return (
               <Link
