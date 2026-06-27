@@ -5,6 +5,7 @@ interface Category {
   id: string;
   name: string;
   slug: string | null;
+  products:Product[]
 }
 interface Product {
   id: string;
