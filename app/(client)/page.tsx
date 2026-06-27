@@ -69,21 +69,22 @@ export default function Home() {
           {/* TEXTE TRADUIT EN FRANÇAIS */}
           <div className="space-y-4">
             <span className="inline-flex items-center rounded-full bg-primary/10 px-4 py-1 text-xs font-semibold text-primary">
-              🔥 Promotions du Moment
+              🚀 Performances de Pointe
             </span>
 
             <div>
               <h1 className="text-4xl lg:text-5xl font-black tracking-tight text-foreground">
-                Mode & Style
+                Technologie & Puissance
               </h1>
               <h1 className="text-4xl lg:text-5xl font-black tracking-tight text-primary">
-                Collection Tendances
+                Collection Ordinateurs
               </h1>
             </div>
 
             <p className="max-w-md text-muted text-xs">
-              Découvrez nos nouveautés mode exclusives avec des remises uniques,
-              des produits de qualité supérieure et une livraison rapide.
+              Boostez votre productivité avec nos derniers ordinateurs haute
+              performance. Design épuré, processeurs ultra-rapides et fiabilité
+              garantie pour tous vos projets.
             </p>
 
             <div className="flex items-center gap-4 pt-2">
@@ -92,10 +93,10 @@ export default function Home() {
                 className="!bg-primary px-6"
                 onClick={() => router.push("/shop")}
               >
-                Acheter Maintenant
+                Voir les produits
               </Button>
               <span className="text-sm font-medium text-muted">
-                Jusqu&apos;à -20% de réduction
+                Meilleur rapport qualité-prix
               </span>
             </div>
           </div>
@@ -104,9 +105,9 @@ export default function Home() {
           <div className="relative flex justify-center">
             <div className="absolute h-72 w-72 rounded-full bg-primary/20 blur-3xl" />
             <img
-              src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1000&q=80"
-              alt="Fashion Collection"
-              className="relative z-10 h-[280px] object-cover rounded-3xl transition-transform duration-500 hover:scale-[1.03]"
+              src="https://images.unsplash.com/photo-1541807084-5c52b6b3adef?q=80&w=1000&auto=format&fit=crop"
+              alt="Ordinateur portable haute performance"
+              className="relative z-10 h-[280px] w-full object-cover rounded-3xl transition-transform duration-500 hover:scale-[1.03]"
             />
           </div>
         </div>

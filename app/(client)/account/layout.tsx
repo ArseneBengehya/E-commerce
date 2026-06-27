@@ -1,37 +1,52 @@
 "use client";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { CiLogout, CiShoppingCart, CiUser } from "react-icons/ci";
-import { GoHome } from "react-icons/go";
-import { PiShieldCheckLight } from "react-icons/pi";
+import { GoHome, GoPackage, GoPeople, GoTag } from "react-icons/go";
 
 const AccountLayout = ({ children }: { children: React.ReactNode }) => {
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === "ADMIN";
   const navigations = [
     {
       title: "Dashboard",
       link: "/account",
       icon: <GoHome size={17} />,
+      view: isAdmin,
     },
     {
-      title: "Commandes",
+      title: "Mes commandes",
       link: "/account/orders",
       icon: <CiShoppingCart size={18} />,
+      view: isAdmin,
     },
     {
       title: "Profile",
       link: "/account/profil",
       icon: <CiUser size={18} />,
+      view: isAdmin,
     },
     {
-      title: "Sécurité",
-      link: "/account/credentials",
-      icon: <PiShieldCheckLight size={18} />,
+      title: "Utilisateurs",
+      link: "/account/users",
+      icon: <GoPeople size={18} />,
+      view: isAdmin,
+    },
+    // {
+    //   title: "Categories",
+    //   link: "/account/categories",
+    //   icon: <GoTag size={18} />,
+    //   view: isAdmin,
+    // },
+    {
+      title: "Produits",
+      link: "/account/products",
+      icon: <GoPackage size={18} />,
+      view: isAdmin,
     },
   ];
-
-  
 
   const pathname = usePathname();
   const currentNav = navigations.find((item) => pathname === item.link);
@@ -39,7 +54,6 @@ const AccountLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="px-4 py-4 lg:px-16 mx-auto max-w-7xl bg-white flex flex-col md:flex-row gap-5 items-start">
-      
       {/* SIDEBAR COMPACTE & ÉPURÉE */}
       <div className="w-full md:w-60 border border-slate-100 rounded-xl p-2 bg-white shadow-xs shrink-0">
         <div className="space-y-1">
@@ -55,7 +69,9 @@ const AccountLayout = ({ children }: { children: React.ReactNode }) => {
                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-50/70"
                 }`}
               >
-                <span className={`flex items-center justify-center shrink-0 ${isActive ? "text-primary" : "text-slate-400"}`}>
+                <span
+                  className={`flex items-center justify-center shrink-0 ${isActive ? "text-primary" : "text-slate-400"}`}
+                >
                   {item.icon}
                 </span>
                 <span>{item.title}</span>
@@ -66,10 +82,11 @@ const AccountLayout = ({ children }: { children: React.ReactNode }) => {
 
         {/* Bouton de déconnexion aligné */}
         <div className="mt-2 pt-2 border-t border-slate-100">
-          <button className="w-full flex items-center gap-3 py-2 px-3 text-xs font-bold text-red-500 hover:text-red-600 hover:bg-red-50/60 rounded-lg transition-all cursor-pointer text-left"
-          onClick={()=>{
-            signOut({ redirectTo: "/" })
-          }}
+          <button
+            className="w-full flex items-center gap-3 py-2 px-3 text-xs font-bold text-red-500 hover:text-red-600 hover:bg-red-50/60 rounded-lg transition-all cursor-pointer text-left"
+            onClick={() => {
+              signOut({ redirectTo: "/" });
+            }}
           >
             <span className="flex items-center justify-center shrink-0">
               <CiLogout size={17} />
@@ -87,13 +104,10 @@ const AccountLayout = ({ children }: { children: React.ReactNode }) => {
             {pageTitle}
           </h2>
         </div>
-        
-        {/* Contenu de la sous-page */}
-        <div className="p-4">
-          {children}
-        </div>
-      </div>
 
+        {/* Contenu de la sous-page */}
+        <div className="p-4">{children}</div>
+      </div>
     </div>
   );
 };
