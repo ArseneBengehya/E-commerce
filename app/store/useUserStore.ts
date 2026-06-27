@@ -21,7 +21,7 @@ export const useUserStore = create<UserState>((set, get) => ({
   fetchUsers: async () => {
     set({ isLoading: true });
     try {
-      const res = await fetch("/api/admin/users");
+      const res = await fetch("/api/users");
       const data = await res.json();
       set({ users: data });
     } catch (error) {
@@ -32,14 +32,13 @@ export const useUserStore = create<UserState>((set, get) => ({
   },
 
   updateRole: async (userId, newRole) => {
-    const res = await fetch("/api/admin/users", {
+    const res = await fetch("/api/users", {
       method: "PATCH",
       body: JSON.stringify({ userId, role: newRole }),
       headers: { "Content-Type": "application/json" },
     });
 
     if (res.ok) {
-      // Mise à jour locale sans re-fetch pour une UX instantanée
       set((state) => ({
         users: state.users.map((u) => 
           u.id === userId ? { ...u, role: newRole as any } : u

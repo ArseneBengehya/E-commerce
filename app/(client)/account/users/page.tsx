@@ -10,6 +10,8 @@ const UsersAdminPage = () => {
     fetchUsers();
   }, [fetchUsers]);
 
+  
+
   if (isLoading) return <div className="p-4 text-sm text-slate-500">Chargement des utilisateurs...</div>;
 
   return (
