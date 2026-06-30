@@ -10,7 +10,8 @@ generator client {
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
-}// --- ENUMS ---
+}
+// --- ENUMS ---
 enum OrderStatus {
   PENDING
   PAID
@@ -29,14 +30,14 @@ model User {
   email         String?   @unique
   image         String?
   role          Role      @default(CLIENT)
-  emailVerified DateTime? 
-  
-  accounts      Account[]
-  sessions      Session[]
-  orders        Order[]   
-  
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  emailVerified DateTime?
+
+  accounts Account[]
+  sessions Session[]
+  orders   Order[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Account {
@@ -72,6 +73,7 @@ model Category {
   name      String    @unique
   slug      String?   @unique
   products  Product[]
+  isDelete  Boolean?  @default(false)
   createdAt DateTime  @default(now())
 }
 
@@ -82,6 +84,7 @@ model Product {
   price       Float
   image       String
   stock       Int
+  isDelete    Boolean?    @default(true)
   categoryId  String      @db.ObjectId
   category    Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   orderItems  OrderItem[]
@@ -96,6 +99,7 @@ model Order {
   status      OrderStatus @default(PENDING)
   city        String
   commune     String
+  isDelete    Boolean?    @default(true)
   address     String
   items       OrderItem[]
   createdAt   DateTime    @default(now())
@@ -103,11 +107,12 @@ model Order {
 }
 
 model OrderItem {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  orderId   String  @db.ObjectId
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId String  @db.ObjectId
-  product   Product @relation(fields: [productId], references: [id])
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderId   String   @db.ObjectId
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String   @db.ObjectId
+  product   Product  @relation(fields: [productId], references: [id])
   quantity  Int
+  isDelete  Boolean? @default(true)
   price     Float
 }
