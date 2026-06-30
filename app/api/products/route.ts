@@ -100,3 +100,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ metadata: {}, data: [] }, { status: 500 });
   }
 }
+
+

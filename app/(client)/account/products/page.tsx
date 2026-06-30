@@ -1,6 +1,8 @@
 "use client";
 
 import AddProduct from "@/app/components/AddProduct";
+import EditProduct from "@/app/components/EditProduct";
+import { useAppContext } from "@/app/context";
 import { useProductStore } from "@/app/store/useProductStore";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useState } from "react";
@@ -20,12 +22,16 @@ export default function ProductsAdminPage() {
     {},
   );
 
+  const { item,setItem } = useAppContext();
+
   useEffect(() => {
     fetchProducts();
     fetchCategories();
   }, [fetchProducts, fetchCategories]);
 
-    const [openedAdd, { open: openAdd, close: closeAdd }] = useDisclosure(false);
+  const [openedAdd, { open: openAdd, close: closeAdd }] = useDisclosure(false);
+  const [openedEdit, { open: openEdit, close: closeEdit }] =
+    useDisclosure(false);
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -96,7 +102,13 @@ export default function ProductsAdminPage() {
                 </td>
                 <td className="p-4 text-center">
                   <button className="text-green-500 hover:bg-green-50 p-2 rounded-full transition">
-                    <CiEdit size={18} />
+                    <CiEdit
+                      size={18}
+                      onClick={() => {
+                        setItem(p);
+                        openEdit();
+                      }}
+                    />
                   </button>
                   <button
                     onClick={() => deleteProduct(p.id)}
@@ -115,6 +127,14 @@ export default function ProductsAdminPage() {
         opened={openedAdd}
         onClose={closeAdd}
         title="Ajouter un nouveau produit"
+        size="md"
+      />
+
+      <EditProduct
+        opened={openedEdit}
+        onClose={closeEdit}
+        key={item?.id || "empty"}
+        title="Modifier un produit"
         size="md"
       />
     </div>

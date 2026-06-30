@@ -48,6 +48,7 @@ interface ProductState {
   addCategory: (category: any) => Promise<void>;
   updateStock: (id: string, stock: number) => Promise<void>;
   updateCategory: (id: string, name: string, slug: string) => Promise<void>;
+  updateProduct: (form: any) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
   deleteCategory: (id: string, onComplete?: () => void) => Promise<void>;
   clearProducts: () => void;
@@ -178,6 +179,33 @@ export const useProductStore = create<ProductState>()(
         }
       },
 
+      //modifier un produit
+      updateProduct: async (form) => {
+        try {
+          set({ isActionLoading: true });
+          const response = await fetch("/api/products/item", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(form),
+          });
+
+          if (!response.ok) throw new Error("Erreur lors de la mise à jour");
+
+          const data = await response.json();
+          set((state) => ({
+            products: state.products.map((c) =>
+              c.id === form.id ? { ...c, ...data.data } : c,
+            ),
+          }));
+          sucessNotification(data.message);
+        } catch (error) {
+          console.error("Échec de la mise à jour :", error);
+          errorNotification(error as string);
+        } finally {
+          set({ isActionLoading: false });
+        }
+      },
+
       //suppression(mise a jour de isdelete)
       deleteCategory: async (id, onComplete) => {
         try {
@@ -224,6 +252,7 @@ export const useProductStore = create<ProductState>()(
       clearProducts: () =>
         set({ products: [], categories: [], metadata: null }),
     }),
+
     { name: "product-storage", storage: createJSONStorage(() => localStorage) },
   ),
 );
