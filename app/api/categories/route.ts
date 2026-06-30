@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
     if (!name || !slug) {
       return NextResponse.json(
         { message: "Tous les champs sont requis" },
-        { status: 404 },
+        { status: 400 },
       );
     }
 

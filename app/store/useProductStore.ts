@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { errorNotification, sucessNotification } from "../utils";
+import { Order } from "./useOrderStore";
 
 interface Category {
   id: string;
@@ -18,6 +19,7 @@ interface Product {
   stock: number;
   categoryId: string;
   category: Category;
+  orderItems: Order[];
 }
 interface Metadata {
   totalProducts: number;
@@ -83,13 +85,29 @@ export const useProductStore = create<ProductState>()(
       },
 
       //ajout d'un nouveau produit
-      addProduct: async (newProduct) => {
-        const res = await fetch("/api/products", {
-          method: "POST",
-          body: JSON.stringify(newProduct),
-        });
-        if (res.ok) {
-          get().fetchProducts();
+      addProduct: async (product) => {
+        try {
+          set({ isActionLoading: true });
+          const res = await fetch("/api/products", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(product),
+          });
+
+          if (!res.ok) throw new Error("Erreur lors de l'ajout");
+
+          const data = await res.json();
+          set((state) => {
+            return {
+              products: [...state.products, data.product],
+            };
+          });
+          sucessNotification(data.message);
+        } catch (error) {
+          console.error("Échec de l'ajout :", error);
+          errorNotification(error as string);
+        } finally {
+          set({ isActionLoading: false });
         }
       },
 

@@ -6,18 +6,32 @@ const prisma = new PrismaClient();
 // POST: Créer un produit
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const { name, description, price, image, stock, categoryId } =
+      await req.json();
+    if (!name || !image || !categoryId || price < 0 || stock < 0) {
+      return NextResponse.json(
+        { message: "Tous les champs sont requis" },
+        { status: 400 },
+      );
+    }
     const product = await prisma.product.create({
       data: {
-        name: body.name,
-        description: body.description || "",
-        price: parseFloat(body.price),
-        image: body.image,
-        stock: parseInt(body.stock),
-        categoryId: body.categoryId,
+        name,
+        description,
+        price,
+        image,
+        stock,
+        categoryId,
+      },
+      include: {
+        category: true,
+        orderItems: true,
       },
     });
-    return NextResponse.json(product, { status: 201 });
+    return NextResponse.json(
+      { message: "Produit ajouté avec succès", product },
+      { status: 201 },
+    );
   } catch (error) {
     return NextResponse.json({ error: "Erreur création" }, { status: 400 });
   }
@@ -43,7 +57,7 @@ export async function DELETE(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     if (!id) throw new Error("ID requis");
-    
+
     await prisma.product.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -60,23 +74,23 @@ export async function GET(request: NextRequest) {
 
     const [totalProducts, products] = await prisma.$transaction([
       prisma.product.count(),
-      prisma.product.findMany({ 
-        skip, 
-        take: limit, 
-        include: { category: true }, 
-        orderBy: { createdAt: "desc" } 
+      prisma.product.findMany({
+        skip,
+        take: limit,
+        include: { category: true },
+        orderBy: { createdAt: "desc" },
       }),
     ]);
 
     // Retourne toujours un objet JSON propre
     return NextResponse.json({
-      metadata: { 
-        totalProducts, 
-        totalPages: Math.ceil(totalProducts / limit), 
-        currentPage: page, 
-        limit, 
-        hasNextPage: page < Math.ceil(totalProducts / limit), 
-        hasPrevPage: page > 1 
+      metadata: {
+        totalProducts,
+        totalPages: Math.ceil(totalProducts / limit),
+        currentPage: page,
+        limit,
+        hasNextPage: page < Math.ceil(totalProducts / limit),
+        hasPrevPage: page > 1,
       },
       data: products || [], // Si products est null, on envoie un tableau vide
     });
