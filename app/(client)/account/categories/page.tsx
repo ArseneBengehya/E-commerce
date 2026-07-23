@@ -31,12 +31,6 @@ const UsersAdminPage = () => {
 
   const { item, setItem, setId, id } = useAppContext();
 
-  const categoriesFiltered = useMemo(() => {
-    return categories.filter((c) => {
-      return c && c.isDelete === false;
-    });
-  }, [categories]);
-
   if (isCategoriesLoading)
     return (
       <div className="p-4 text-sm text-slate-500">
@@ -76,7 +70,7 @@ const UsersAdminPage = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {categoriesFiltered.map((item) => (
+            {categories.map((item) => (
               <tr
                 key={item.id}
                 className="hover:bg-slate-50/30 transition-colors"

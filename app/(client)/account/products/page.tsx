@@ -30,12 +30,6 @@ export default function ProductsAdminPage() {
     fetchCategories();
   }, [fetchProducts, fetchCategories]);
 
-    const productsFiltered = useMemo(() => {
-      return products.filter((p) => {
-        return p && p.isDelete === false;
-      });
-    }, [products]);
-
   const [openedAdd, { open: openAdd, close: closeAdd }] = useDisclosure(false);
   const [openedEdit, { open: openEdit, close: closeEdit }] =
     useDisclosure(false);
@@ -71,7 +65,7 @@ export default function ProductsAdminPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {productsFiltered.map((p) => (
+            {products.map((p) => (
               <tr key={p.id} className="hover:bg-slate-50/50 transition-colors">
                 <td className="p-4 font-semibold text-slate-800">{p.name}</td>
                 <td className="p-4">
