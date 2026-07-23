@@ -40,9 +40,9 @@ export async function PATCH(req: Request) {
         name,
         slug,
       },
-      include:{
-        products:true
-      }
+      include: {
+        products: true,
+      },
     });
 
     return NextResponse.json(
@@ -61,6 +61,7 @@ export async function PATCH(req: Request) {
 export async function POST(req: NextRequest) {
   try {
     const { name, slug } = await req.json();
+
     if (!name || !slug) {
       return NextResponse.json(
         { message: "Tous les champs sont requis" },
@@ -68,20 +69,71 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const category = await prisma.category.create({
-      data: {
-        name,
-        slug,
-      },
-      include: {
-        products: true,
+    const existingCategory = await prisma.category.findFirst({
+      where: {
+        OR: [{ name }, { slug }],
       },
     });
+
+    let category;
+
+    if (existingCategory) {
+      if (existingCategory.isDelete) {
+        category = await prisma.$transaction(async (tx) => {
+          const suffix = `_old_${Date.now()}`;
+          await tx.category.update({
+            where: { id: existingCategory.id },
+            data: {
+              name: `${existingCategory.name}${suffix}`,
+              slug: `${existingCategory.slug}${suffix}`,
+            },
+          });
+
+          const newCategory = await tx.category.create({
+            data: { name, slug },
+          });
+
+          return newCategory;
+        });
+      } else {
+        return NextResponse.json(
+          { message: "Cette catégorie existe déjà." },
+          { status: 400 },
+        );
+      }
+    } else {
+      category = await prisma.category.create({
+        data: { name, slug },
+      });
+    }
+
     return NextResponse.json(
       { message: "Catégorie ajoutée avec succès", category },
       { status: 201 },
     );
-  } catch (error) {
+  } catch (error: any) {
+    if (error.code === "P2002") {
+      return NextResponse.json(
+        { message: "Cette catégorie (nom ou slug) existe déjà." },
+        { status: 400 },
+      );
+    }
+
+    if (
+      error.code === "P1001" ||
+      error.code === "P2024" ||
+      error.name === "PrismaClientInitializationError"
+    ) {
+      return NextResponse.json(
+        {
+          message:
+            "Délai de connexion dépassé ou base de données inaccessible.",
+        },
+        { status: 504 },
+      );
+    }
+
+    console.error("Erreur serveur :", error);
     return NextResponse.json({ message: "Erreur serveur" }, { status: 500 });
   }
 }

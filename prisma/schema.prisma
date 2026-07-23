@@ -75,6 +75,9 @@ model Category {
   products  Product[]
   isDelete  Boolean?  @default(false)
   createdAt DateTime  @default(now())
+
+  @@unique([name, isDelete])
+  @@unique([slug, isDelete])
 }
 
 model Product {

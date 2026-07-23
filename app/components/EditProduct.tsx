@@ -44,22 +44,21 @@ const EditProduct = ({ opened, onClose, title, size }: any) => {
     [categories],
   );
 
-  const resetInputs = () => {
-    setFormData({
-      id:"",
-      name: "",
-      price: 0,
-      stock: 0,
-      image: "",
-      categoryId: "",
-      description: "",
-    });
-  };
+  // const resetInputs = () => {
+  //   setFormData({
+  //     id:"",
+  //     name: "",
+  //     price: 0,
+  //     stock: 0,
+  //     image: "",
+  //     categoryId: "",
+  //     description: "",
+  //   });
+  // };
 
   const handleSubmit = async () => {
     await updateProduct(formData);
     onClose();
-    resetInputs();
   };
 
   return (
@@ -67,7 +66,6 @@ const EditProduct = ({ opened, onClose, title, size }: any) => {
       opened={opened}
       onClose={() => {
         onClose();
-        resetInputs();
       }}
       title={title}
       size={size}

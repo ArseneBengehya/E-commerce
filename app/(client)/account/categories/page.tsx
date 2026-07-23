@@ -23,7 +23,7 @@ const UsersAdminPage = () => {
     if (categories.length === 0) {
       fetchCategories();
     }
-  }, [fetchCategories, categories.length]);
+  }, [categories.length]);
   const [openedEdit, { open: openEdit, close: closeEdit }] =
     useDisclosure(false);
   const [openedDel, { open: openDel, close: closeDel }] = useDisclosure(false);
@@ -101,6 +101,7 @@ const UsersAdminPage = () => {
                       className="text-rose-500 hover:bg-rose-50 p-2 rounded-full transition"
                       onClick={() => {
                         setId(item.id);
+                        setItem(item)
                         openDel();
                       }}
                     >
@@ -125,7 +126,7 @@ const UsersAdminPage = () => {
         opened={openedDel}
         onClose={closeDel}
         title="Suppression de la cetégorie"
-        message="Voulez vous vraiment supprimer cette catégorie ?, cette action est irréversible et entrainera la suppression de produits liés à cette catégorie."
+        message={`Voulez vous vraiment supprimer cette ${item.name} ?, cette action est irréversible et entrainera la suppression de produits liés à cette catégorie.`}
         delFunction={(id) => deleteCategory(id, closeDel)}
         isLoading={isActionLoading}
       />

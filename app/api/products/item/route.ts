@@ -11,7 +11,7 @@ export async function PATCH(req: Request) {
 
     const { name, description, price, image, stock, categoryId, id } =
       await req.json();
-    if (!name || !image || !categoryId || price < 0 || stock < 0) {
+    if (!name || !image || !categoryId || price < 0 || stock < 0 || !id) {
       return NextResponse.json(
         { message: "Tous les champs sont requis" },
         { status: 400 },

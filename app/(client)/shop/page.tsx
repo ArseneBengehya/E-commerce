@@ -44,13 +44,6 @@ export default function Page() {
 
   // No effect needed to sync id -> selectedCategoryId because we initialize state from the param
 
-  // LOGIQUE DE FILTRAGE CÔTÉ CLIENT
-  const filteredProducts = useMemo(() => {
-    if (!selectedCategoryId) return products;
-    return products.filter(
-      (product) => product.categoryId === selectedCategoryId,
-    );
-  }, [products, selectedCategoryId]);
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-6">
@@ -104,7 +97,7 @@ export default function Page() {
         <p className="text-[11px] font-medium text-muted tracking-wide uppercase px-1">
           Nous avons trouvé{" "}
           <span className="text-primary font-black">
-            {filteredProducts.length}
+            {products.length}
           </span>{" "}
           produits {selectedCategoryId && "dans cette catégorie"}
         </p>
@@ -127,7 +120,7 @@ export default function Page() {
                   <div className="h-8 bg-gray-200 rounded-lg w-full" />
                 </div>
               ))
-            : filteredProducts.map((product) => (
+            : products.map((product) => (
                 <Card key={product.id} product={product} />
               ))}
         </div>

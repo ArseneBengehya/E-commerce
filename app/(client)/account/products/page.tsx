@@ -1,33 +1,40 @@
 "use client";
 
 import AddProduct from "@/app/components/AddProduct";
+import DeleteAlert from "@/app/components/DeleteAlert";
 import EditProduct from "@/app/components/EditProduct";
 import { useAppContext } from "@/app/context";
 import { useProductStore } from "@/app/store/useProductStore";
 import { useDisclosure } from "@mantine/hooks";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CiTrash, CiSaveDown2, CiCircleRemove, CiEdit } from "react-icons/ci";
 
 export default function ProductsAdminPage() {
   const {
     products,
     fetchProducts,
-    addProduct,
     deleteProduct,
     updateStock,
-    categories,
     fetchCategories,
+    isActionLoading,
   } = useProductStore();
   const [editingStocks, setEditingStocks] = useState<Record<string, number>>(
     {},
   );
 
-  const { item,setItem } = useAppContext();
+  const [openedDel, { open: openDel, close: closeDel }] = useDisclosure(false);
+  const { item, setItem, id, setId } = useAppContext();
 
   useEffect(() => {
     fetchProducts();
     fetchCategories();
   }, [fetchProducts, fetchCategories]);
+
+    const productsFiltered = useMemo(() => {
+      return products.filter((p) => {
+        return p && p.isDelete === false;
+      });
+    }, [products]);
 
   const [openedAdd, { open: openAdd, close: closeAdd }] = useDisclosure(false);
   const [openedEdit, { open: openEdit, close: closeEdit }] =
@@ -64,7 +71,7 @@ export default function ProductsAdminPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {products.map((p) => (
+            {productsFiltered.map((p) => (
               <tr key={p.id} className="hover:bg-slate-50/50 transition-colors">
                 <td className="p-4 font-semibold text-slate-800">{p.name}</td>
                 <td className="p-4">
@@ -111,7 +118,11 @@ export default function ProductsAdminPage() {
                     />
                   </button>
                   <button
-                    onClick={() => deleteProduct(p.id)}
+                    onClick={() => {
+                      setId(p.id);
+                      openDel();
+                      setItem(p)
+                    }}
                     className="text-rose-500 hover:bg-rose-50 p-2 rounded-full transition"
                   >
                     <CiTrash size={18} />
@@ -136,6 +147,15 @@ export default function ProductsAdminPage() {
         key={item?.id || "empty"}
         title="Modifier un produit"
         size="md"
+      />
+
+      <DeleteAlert
+        opened={openedDel}
+        onClose={closeDel}
+        title="Suppression de la cetégorie"
+        message={`Voulez vous vraiment supprimer ${item.name} ?, cette action est irréversible.`}
+        delFunction={(id) => deleteProduct(id, closeDel)}
+        isLoading={isActionLoading}
       />
     </div>
   );

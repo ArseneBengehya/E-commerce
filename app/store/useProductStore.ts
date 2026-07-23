@@ -18,6 +18,7 @@ interface Product {
   image: string;
   stock: number;
   categoryId: string;
+  isDelete: boolean;
   category: Category;
   orderItems: Order[];
 }
@@ -30,9 +31,11 @@ interface Metadata {
   hasPrevPage: boolean;
 }
 
-interface ProductState {
+export interface ProductState {
   products: Product[];
+  allProducts: Product[];
   categories: Category[];
+  allCategories: Category[];
   metadata: Metadata | null;
   isLoading: boolean;
   isCategoriesLoading?: boolean;
@@ -44,12 +47,14 @@ interface ProductState {
     loadMore?: boolean,
   ) => Promise<void>;
   fetchCategories: () => Promise<void>;
+  fetchAllCategories: () => Promise<void>;
+  fetchAllProducts:()=> Promise<void>;
   addProduct: (product: any) => Promise<void>;
   addCategory: (category: any) => Promise<void>;
   updateStock: (id: string, stock: number) => Promise<void>;
   updateCategory: (id: string, name: string, slug: string) => Promise<void>;
   updateProduct: (form: any) => Promise<void>;
-  deleteProduct: (id: string) => Promise<void>;
+  deleteProduct: (id: string, onComplete?: () => void) => Promise<void>;
   deleteCategory: (id: string, onComplete?: () => void) => Promise<void>;
   clearProducts: () => void;
 }
@@ -59,30 +64,84 @@ export const useProductStore = create<ProductState>()(
     (set, get) => ({
       products: [],
       categories: [],
+      allCategories: [],
       metadata: null,
       isLoading: false,
-
+      allProducts: [],
       //recuperation de produits
       fetchProducts: async (page = 1, limit = 50, loadMore = false) => {
-        set({ isLoading: true });
-        const res = await fetch(`/api/products?page=${page}&limit=${limit}`);
-        const result = await res.json();
-        set({
-          products: loadMore
-            ? [...get().products, ...result.data]
-            : result.data,
-          metadata: result.metadata,
-          isLoading: false,
-        });
+        try {
+          set({ isLoading: true });
+          const res = await fetch(`/api/products?page=${page}&limit=${limit}`);
+          const result = await res.json();
+          set({
+            products: loadMore
+              ? [...get().products, ...result.data.filter((item: Product) => !item.isDelete)]
+              : result.data,
+            metadata: result.metadata,
+            isLoading: false,
+          });
+        } catch (error) {
+          console.warn(
+            "Impossible de récupérer les produits en ligne, utilisation du cache local.",
+          );
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      fetchAllProducts: async (page = 1, limit = 50, loadMore = false) => {
+        try {
+          set({ isLoading: true });
+          const res = await fetch(`/api/products?page=${page}&limit=${limit}`);
+          const result = await res.json();
+          set({
+            allProducts: loadMore
+              ? [...get().allProducts, ...result.data]
+              : result.data,
+            metadata: result.metadata,
+            isLoading: false,
+          });
+        } catch (error) {
+          console.warn(
+            "Impossible de récupérer les produits en ligne, utilisation du cache local.",
+          );
+        } finally {
+          set({ isLoading: false });
+        }
       },
 
       //recuperation de categorie
       fetchCategories: async () => {
         set({ isCategoriesLoading: true });
-        const res = await fetch("/api/categories");
-        const data = await res.json();
-        set({ categories: data });
-        set({ isCategoriesLoading: false });
+        try {
+          const res = await fetch("/api/categories");
+          if (!res.ok) throw new Error("Erreur réseau");
+          const data = await res.json();
+          set({ categories: data.filter((item: Category) => !item.isDelete) });
+        } catch (error) {
+          console.warn(
+            "Impossible de récupérer les catégories en ligne, utilisation du cache local.",
+          );
+        } finally {
+          set({ isCategoriesLoading: false });
+        }
+      },
+
+      fetchAllCategories: async () => {
+        set({ isActionLoading: true });
+        try {
+          const res = await fetch("/api/categories");
+          if (!res.ok) throw new Error("Erreur réseau");
+          const data = await res.json();
+          set({ allCategories: data });
+        } catch (error) {
+          console.warn(
+            "Impossible de récupérer les catégories en ligne, utilisation du cache local.",
+          );
+        } finally {
+          set({ isActionLoading: false });
+        }
       },
 
       //ajout d'un nouveau produit
@@ -122,18 +181,19 @@ export const useProductStore = create<ProductState>()(
             body: JSON.stringify(category),
           });
 
-          if (!res.ok) throw new Error("Erreur lors de la mise à jour");
-
           const data = await res.json();
+
+          if (!res.ok) throw new Error(data.message || "Erreur lors l'ajout");
           set((state) => {
             return {
               categories: [...state.categories, data.category],
             };
           });
           sucessNotification(data.message);
-        } catch (error) {
-          console.error("Échec de la mise à jour :", error);
-          errorNotification(error as string);
+        } catch (error: any) {
+          console.error("Échec de l'ajout de la categorie :", error);
+          console.log(error);
+          errorNotification(error.message as string);
         } finally {
           set({ isActionLoading: false });
         }
@@ -228,9 +288,11 @@ export const useProductStore = create<ProductState>()(
             categories: state.categories.map((c) =>
               c.id === id ? { ...c, ...data.categories } : c,
             ),
-            products: state.products.map((p) =>
-              p.categoryId === id ? { ...p, isDelete: false } : p,
-            ),
+            products: data.products
+              ? state.products.map((p) =>
+                  p.categoryId === id ? { ...p, isDelete: false } : p,
+                )
+              : state.products,
           }));
           sucessNotification(data.message);
         } catch (error) {
@@ -243,9 +305,31 @@ export const useProductStore = create<ProductState>()(
       },
 
       //suppression de produits
-      deleteProduct: async (id) => {
-        await fetch(`/api/products?id=${id}`, { method: "DELETE" });
-        set({ products: get().products.filter((p) => p.id !== id) });
+      deleteProduct: async (id, onComplete) => {
+        try {
+          set({ isActionLoading: true });
+          const response = await fetch("/api/products/delete", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id }),
+          });
+
+          if (!response.ok) throw new Error("Erreur lors de la suppression");
+
+          const data = await response.json();
+          set((state) => ({
+            products: state.products.map((p) =>
+              p.id === id ? { ...p, ...data.updatedProduct } : p,
+            ),
+          }));
+          sucessNotification(data.message);
+        } catch (error) {
+          console.error("Échec de la suppression :", error);
+          errorNotification(error as string);
+        } finally {
+          set({ isActionLoading: false });
+          if (onComplete) onComplete();
+        }
       },
 
       //vider le storage de categories et produits

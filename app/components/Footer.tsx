@@ -1,26 +1,16 @@
 "use client";
 import { AppName } from "../utils";
 import Link from "next/link";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { FaCcVisa, FaCcMastercard, FaCcPaypal } from "react-icons/fa";
 import { useProductStore } from "../store/useProductStore";
 import { useRouter } from "next/navigation";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-  const { categories, fetchCategories } = useProductStore();
-  const randomCategories = useMemo(() => {
-    if (categories.length === 0) return [];
-    const shuffled = [...categories].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 2);
-  }, [categories]);
-
-  useEffect(() => {
-    if (categories.length === 0) {
-      fetchCategories();
-    }
-  }, [fetchCategories, categories.length]);
-  const router = useRouter()
+  const { categories } = useProductStore();
+  const randomCategories = useMemo(() => categories.slice(0, 2), [categories]);
+  const router = useRouter();
 
   return (
     <footer className="w-full bg-zinc-950 text-zinc-400 text-[11px] border-t border-zinc-800/50">
@@ -38,11 +28,18 @@ const Footer = () => {
         </div>
 
         {/* COLONNE 2 : BOUTIQUE */}
-  <div className="space-y-2">
-          <h4 className="text-zinc-200 font-bold uppercase tracking-wider text-[10px]">Boutique</h4>
+        <div className="space-y-2">
+          <h4 className="text-zinc-200 font-bold uppercase tracking-wider text-[10px]">
+            Boutique
+          </h4>
           <ul className="space-y-1.5 font-medium">
             <li>
-              <Link href="/shop" className="hover:text-primary transition-colors">Tous les produits</Link>
+              <Link
+                href="/shop"
+                className="hover:text-primary transition-colors"
+              >
+                Tous les produits
+              </Link>
             </li>
             {randomCategories.map((cat) => (
               <li key={cat.id}>

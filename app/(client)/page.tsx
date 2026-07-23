@@ -2,11 +2,8 @@
 import { Button } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
-import { CiShoppingCart } from "react-icons/ci";
-import { MdFavoriteBorder } from "react-icons/md";
 import { useProductStore } from "../store/useProductStore";
 import { Card } from "../components/Card";
-import { useCartStore } from "../store/useCartStore";
 
 export default function Home() {
   const {
@@ -15,20 +12,19 @@ export default function Home() {
     fetchProducts,
     categories,
     fetchCategories,
+    fetchAllCategories,
+    allCategories,
     isCategoriesLoading,
   } = useProductStore();
-
-  const { cart } = useCartStore();
 
   useEffect(() => {
     fetchProducts(1, 100, false);
   }, []);
 
   useEffect(() => {
-    if (categories.length === 0) {
-      fetchCategories();
-    }
-  }, [fetchCategories, categories.length]);
+    fetchCategories();
+    fetchAllCategories();
+  }, [categories.length, categories]);
 
   const tabs = ["Vedette", "Récents", "Anciens"];
   const [tabActive, setTabActive] = useState("Vedette");
@@ -158,7 +154,7 @@ export default function Home() {
 
       {/* GRILLE PRODUITS (VRAIES DONNÉES ET SQUELETTES) */}
       <div className="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {isLoading && products.length === 0
+        {isLoading && products?.length === 0
           ? /* Squelettes Produits */
             Array.from({ length: 8 }).map((_, index) => (
               <div

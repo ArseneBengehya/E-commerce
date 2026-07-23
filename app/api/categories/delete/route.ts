@@ -10,10 +10,19 @@ export async function PATCH(req: NextRequest) {
     if (session?.user?.role !== "ADMIN") {
       return NextResponse.json({ message: "Non autorisé" }, { status: 403 });
     }
-    const { id } = await req.json();
-    if (!id) throw new Error("ID requis");
 
-    const category = await prisma.category.findFirst({ where: { id } });
+    const body = await req.json();
+    const { id } = body;
+    
+    if (!id) {
+      return NextResponse.json({ message: "ID requis" }, { status: 400 });
+    }
+
+    const category = await prisma.category.findFirst({
+      where: { id },
+      include: { products: true },
+    });
+
     if (!category) {
       return NextResponse.json(
         { message: "La catégorie n'existe pas" },
@@ -23,42 +32,33 @@ export async function PATCH(req: NextRequest) {
 
     if (category.isDelete) {
       return NextResponse.json(
-        { message: "Cette catégorie a déjà été suprimée" },
-        { status: 404 },
+        { message: "Cette catégorie a déjà été supprimée" },
+        { status: 400 },
       );
     }
 
-    const products = await prisma.product.updateMany({
-      where: { categoryId: id },
-      data: {
-        isDelete: true,
-        include: {
-          products: true,
-        },
-      },
-    });
-
-    const categories = await prisma.category.update({
-      where: { id },
-      data: {
-        isDelete: true,
-        include: {
-          products: true,
-        },
-      },
-    });
+    const [updatedProducts, updatedCategory] = await prisma.$transaction([
+      prisma.product.updateMany({
+        where: { categoryId: id },
+        data: { isDelete: true },
+      }),
+      prisma.category.update({
+        where: { id },
+        data: { isDelete: true },
+        include: { products: true },
+      }),
+    ]);
 
     return NextResponse.json(
       {
-        message: "Catégorie suprimée",
-        products,
-        categories,
+        message: "Catégorie supprimée avec succès",
+        products: updatedProducts,
+        categories: updatedCategory,
       },
       { status: 200 },
     );
   } catch (error) {
-    console.log(error);
-
-    return NextResponse.json({ error: "Erreur suppression" }, { status: 400 });
+    console.error("Erreur lors de la suppression :", error);
+    return NextResponse.json({ error: "Erreur suppression" }, { status: 500 });
   }
 }
