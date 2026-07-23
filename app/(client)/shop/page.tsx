@@ -1,10 +1,9 @@
 "use client";
 
 import { Card } from "@/app/components/Card";
-import { useCartStore } from "@/app/store/useCartStore";
 import { useProductStore } from "@/app/store/useProductStore";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState, useMemo } from "react";
+import {  useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Page() {
   const {
@@ -16,8 +15,6 @@ export default function Page() {
     fetchCategories,
     isCategoriesLoading,
   } = useProductStore();
-
-  const { cart } = useCartStore();
 
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
@@ -33,7 +30,7 @@ export default function Page() {
     if (categories.length === 0) {
       fetchCategories();
     }
-  }, [fetchCategories, categories.length]);
+  }, [categories.length, fetchCategories]);
 
   const handleLoadMore = () => {
     if (metadata && metadata.hasNextPage && !isLoading) {
@@ -41,10 +38,6 @@ export default function Page() {
       fetchProducts(nextPage, 50, true);
     }
   };
-
-  // No effect needed to sync id -> selectedCategoryId because we initialize state from the param
-
-
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-6">
       {/* SECTEUR DES CATÉGORIES EN HAUT */}
@@ -96,9 +89,7 @@ export default function Page() {
       <div className="space-y-3">
         <p className="text-[11px] font-medium text-muted tracking-wide uppercase px-1">
           Nous avons trouvé{" "}
-          <span className="text-primary font-black">
-            {products.length}
-          </span>{" "}
+          <span className="text-primary font-black">{products.length}</span>{" "}
           produits {selectedCategoryId && "dans cette catégorie"}
         </p>
 

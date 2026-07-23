@@ -53,7 +53,7 @@ export async function PATCH(req: NextRequest) {
       {
         message: "Catégorie supprimée avec succès",
         products: updatedProducts,
-        categories: updatedCategory,
+        category: updatedCategory,
       },
       { status: 200 },
     );

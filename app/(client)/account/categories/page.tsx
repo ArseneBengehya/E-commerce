@@ -23,13 +23,13 @@ const UsersAdminPage = () => {
     if (categories.length === 0) {
       fetchCategories();
     }
-  }, [categories.length]);
+  }, []);
   const [openedEdit, { open: openEdit, close: closeEdit }] =
     useDisclosure(false);
   const [openedDel, { open: openDel, close: closeDel }] = useDisclosure(false);
   const [openedAdd, { open: openAdd, close: closeAdd }] = useDisclosure(false);
 
-  const { item, setItem, setId, id } = useAppContext();
+  const { item, setItem, setId } = useAppContext();
 
   if (isCategoriesLoading)
     return (
@@ -79,7 +79,7 @@ const UsersAdminPage = () => {
                   {item.name || "Sans nom"}
                 </td>
                 <td className="px-4 py-3 text-slate-500">{item.slug}</td>
-                <td className="px-4 py-3">{item.products.length}</td>
+                <td className="px-4 py-3">{item.products ? item.products.length : 0}</td>
                 <td className="px-4 py-3 font-medium text-slate-900">
                   <div className="flex gap-3 items-center">
                     <button

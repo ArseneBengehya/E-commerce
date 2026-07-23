@@ -48,7 +48,7 @@ export interface ProductState {
   ) => Promise<void>;
   fetchCategories: () => Promise<void>;
   fetchAllCategories: () => Promise<void>;
-  fetchAllProducts:()=> Promise<void>;
+  fetchAllProducts: () => Promise<void>;
   addProduct: (product: any) => Promise<void>;
   addCategory: (category: any) => Promise<void>;
   updateStock: (id: string, stock: number) => Promise<void>;
@@ -76,7 +76,10 @@ export const useProductStore = create<ProductState>()(
           const result = await res.json();
           set({
             products: loadMore
-              ? [...get().products, ...result.data.filter((item: Product) => !item.isDelete)]
+              ? [
+                  ...get().products,
+                  ...result.data.filter((item: Product) => !item.isDelete),
+                ]
               : result.data,
             metadata: result.metadata,
             isLoading: false,
@@ -280,18 +283,13 @@ export const useProductStore = create<ProductState>()(
 
           const data = await response.json();
           set((state) => ({
-            categories: state.categories.map((c) =>
-              c.id === id ? { ...c, ...data.categories } : c,
-            ),
-          }));
-          set((state) => ({
-            categories: state.categories.map((c) =>
-              c.id === id ? { ...c, ...data.categories } : c,
-            ),
+            categories: state.categories
+              .map((c) => (c.id === id ? { ...c, isDelete: true } : c))
+              .filter((cf) => cf.isDelete === false),
             products: data.products
               ? state.products.map((p) =>
-                  p.categoryId === id ? { ...p, isDelete: false } : p,
-                )
+                  p.categoryId === id ? { ...p, isDelete: true } : p,
+                ).filter((pf) => pf.isDelete === false)
               : state.products,
           }));
           sucessNotification(data.message);
